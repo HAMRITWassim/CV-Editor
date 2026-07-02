@@ -1,1 +1,16 @@
+# Fichiers d'environnements
 .env
+server/.env
+client/.env
+
+# Dépendances
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Fichiers de build
+client/dist/
+
+# Autres
+npm-debug.log
+.DS_Store
