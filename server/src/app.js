@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // Middlewares
-app.use(cors()); // Autorise le front à parler au back
-app.use(express.json()); // Permet de lire le JSON dans les requêtes
+app.use(cors());            // Autorise le front à parler au back
+app.use(express.json());    // Permet de lire le JSON dans les requêtes
 
 const cvRoutes = require("./routes/cv.routes.js")
 
@@ -22,7 +22,7 @@ app.get('/api/test', (req, res) => {
     res.json({ message: "BACKEND FONCTIONNEL !" });
 });
 
-// Toutes les requêtes commençant par "/api/cv" seront gérées par cvRoutes
+// Toutes les requêtes commençant par "/api/cv" seront gérées par cv.routes.js
 app.use("/api/cv", cvRoutes);
 
 // Lancement du serveur
