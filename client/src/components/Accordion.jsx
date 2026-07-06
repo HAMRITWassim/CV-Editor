@@ -23,7 +23,10 @@ export default function Accordion({title, children})
         className={`grid transition-all duration-300 ease-in-out ${ isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0' }`}
         >
             <div className="overflow-hidden">
-                <div className="p-6  text-[#fcfbf9] flex flex-col gap-4">
+                <div 
+                className="p-6  text-[#fcfbf9] flex flex-col gap-4 cursor-default"
+                onClick={(e) => e.stopPropagation()}
+                >
                     {children}
                 </div>
             </div>
