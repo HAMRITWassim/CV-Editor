@@ -31,7 +31,7 @@ const cvSchema = new mongoose.Schema({
     // Formations
     education: [{
         degree: String,
-        School: String,
+        school: String,
         startDate: String,
         endDate: String
     }],
