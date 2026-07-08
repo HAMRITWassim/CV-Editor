@@ -13,7 +13,7 @@ export default function RichTextEditor({ value, onChange }) {
 
   const editor = useEditor({
     extensions: [StarterKit],
-    content: value || '<p>Décrivez vos missions...</p>',
+    content: value,
     editorProps: {
       attributes: {
         class: 'p-2 min-h-[120px] outline-none [&_ul]:list-disc [&_ul]:ml-4',
