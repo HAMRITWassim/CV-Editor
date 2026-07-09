@@ -3,7 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 // Import de la fct de connexion
-const connectDB = require('./db.js')
+const connectDB = require('./db.js');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -15,7 +15,8 @@ connectDB();
 app.use(cors());            // Autorise le front à parler au back
 app.use(express.json());    // Permet de lire le JSON dans les requêtes
 
-const cvRoutes = require("./routes/cv.routes.js")
+const cvRoutes = require("./routes/cv.routes.js");
+const pdfRoutes = require("./routes/pdf.routes.js");
 
 // Route de test
 app.get('/api/test', (req, res) => {
@@ -24,6 +25,9 @@ app.get('/api/test', (req, res) => {
 
 // Toutes les requêtes commençant par "/api/cv" seront gérées par cv.routes.js
 app.use("/api/cv", cvRoutes);
+
+// Toutes les requêtes commençant par "/api/pdf" seront gérées par pdf.routes.js
+app.use("/api/pdf", pdfRoutes)
 
 // Lancement du serveur
 app.listen(PORT, () => {

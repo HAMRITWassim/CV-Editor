@@ -19,7 +19,7 @@ const createCV = async (req, res) => {
     }
 };
 
-// Fct de récupération de tous les CVs (GETs)
+// Fct de récupération de tous les CVs (GET)
 const getAllCVs = async (req, res) => {
     try{
         // ramène tout le contenu de la collection

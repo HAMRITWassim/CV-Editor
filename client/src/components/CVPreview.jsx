@@ -85,7 +85,7 @@ export default function CVPreview({cvData, setCvData}){
                 }}
             >
                 {/* FEUILLE BLANCHE */}
-                <div className="bg-white shadow-2xl p-10 flex flex-col w-full h-full">
+                <div id="cv-to-print" className="bg-white shadow-2xl p-10 flex flex-col w-full h-full">
 
                     {/* HEADER */}
                     <header className="flex flex-col items-start gap-1">

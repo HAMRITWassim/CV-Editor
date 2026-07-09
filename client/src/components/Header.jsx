@@ -3,6 +3,50 @@ import cvLogo from '../assets/cv2.png'
 
 export default function Header({cvData, setCvData}){
 
+    // Gère l'export du PDF
+    const handleExportPDF = async () => {
+        try {
+            const cvElement = document.getElementById('cv-to-print');
+            
+            if(!cvElement){
+                alert("Erreur: Impossible de trouver le CV ! (aucun ID 'cv-to-print')")
+                return;
+            }
+
+            // Extrait le contenu HTML à l'intérieur de 'cv-to-print'
+            const htmlToPrint = cvElement.innerHTML;
+
+            // Envoi au BACKEND
+            const response = await fetch("http://localhost:5000/api/pdf/generate", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    html: htmlToPrint,
+                    title: cvData.title
+                }),
+            });
+
+            if (!response.ok) throw new Error("Erreur réseau");
+
+            // Transforme la réponse en fichier (Blob)
+            const blob = await response.blob();
+
+            
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `${cvData.title || 'Mon_CV'}.pdf`);
+            document.body.appendChild(link);
+            link.click();   //déclenche le téléchargement
+
+            link.parentNode.removeChild(link);
+        } 
+        catch (error) {
+            console.error("Erreur lors de l'export:", error);
+            alert("Impossible de générer le PDF.");
+        }
+    }
+
 
     return (
 
@@ -24,7 +68,10 @@ export default function Header({cvData, setCvData}){
 
             <div className=' flex-1 flex justify-end pr-6'>
                 
-                <button className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer'>
+                <button
+                className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer'
+                onClick={handleExportPDF}
+                >
                     Exporter en PDF
                 </button>
             </div>
