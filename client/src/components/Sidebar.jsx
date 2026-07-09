@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { SyncLoader } from "react-spinners";
 
 
 // COMPONENTS
@@ -10,6 +11,7 @@ export default function Sidebar({cvData, setCvData}){
     //STATES
     const [openAccordionsCount, setOpenAccordionsCount] = useState(0);
 
+    const [loadingIndex, setLoadingIndex] = useState(null);
 
 
     
@@ -24,7 +26,55 @@ export default function Sidebar({cvData, setCvData}){
     };
 
 
+    // Fonction de reformulation par IA (appel au BACK)
+    const handleRephrase = async (index) => {
+        
+        // Récupère le HTML de description de l'expérience actuelle
+        const currentText = cvData.experiences[index].description;
 
+        // Retire les balises HTML
+        const rawText = currentText?.replace(/<[^>]*>/g, '').trim();
+        if(!rawText){
+            alert("Veuillez d'abord remplir le champs de description avant de reformuler !");
+            return;
+        }
+
+        try {
+            setLoadingIndex(index);
+
+            // Appel à l'API BACK
+            const response = await fetch("http://localhost:5000/api/ai/reformuler",{
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({text: currentText})
+            })
+
+            if(!response.ok) throw new Error("Erreur lors de la communication avec le serveur.");
+
+            const data = await response.json();
+
+            if(data.result){
+                const newExperiences = [...cvData.experiences];
+
+                // Remplace le texte par le reformulé (à l'index correspondant)
+                newExperiences[index].description = data.result;
+
+                setCvData({
+                    ...cvData,
+                    experiences: newExperiences
+                });
+            }
+        }
+        catch (error) {
+            console.error("Erreur de reformulation :", error);
+            alert("Impossible de reformuler le text. Veuillez vérifier l'état du serveur.")   
+        }
+        finally{
+            // Reset l'indice
+            setLoadingIndex(null)
+        }
+
+    }
 
 
     return (
@@ -193,6 +243,19 @@ export default function Sidebar({cvData, setCvData}){
                             </div>
 
                             <div>
+                                
+                                <button
+                                className={`flex-1 px-4 py-2 mt-3 rounded-full font-bold text-[#311603] transition-colors text-sm ${
+                                        loadingIndex === index 
+                                        ? 'bg-gray-700 text-gray-300 cursor-not-allowed' 
+                                        : 'bg-[#fccc69] hover:bg-[#ffcd86] hover:cursor-pointer'
+                                    }`}
+                                onClick={() => handleRephrase(index)}
+                                disabled={loadingIndex === index}
+                                >
+                                   {loadingIndex === index ? <SyncLoader color='#6a7282' size={5} speedMultiplier={0.7} />  : "✨ Reformuler" }
+                                </button>
+
                                 <button 
                                 className='bg-[#61310e] mt-4 px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer'
                                 onClick={() => {
@@ -205,8 +268,10 @@ export default function Sidebar({cvData, setCvData}){
                                     });
                                 }}	
                                 >
-                                    Supprimer
+                                    Supprimer l'expérience
                                 </button>
+
+                                
 
                             </div>
 
@@ -551,9 +616,7 @@ export default function Sidebar({cvData, setCvData}){
             isSidebarOpen={openAccordionsCount > 0}
             >
 
-                <button className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer'>
-                    Reformuler
-                </button>
+                
 
                 <button className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer'>
                     Traduire

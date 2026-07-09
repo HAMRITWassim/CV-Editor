@@ -17,7 +17,7 @@ app.use(express.json());    // Permet de lire le JSON dans les requêtes
 
 const cvRoutes = require("./routes/cv.routes.js");
 const pdfRoutes = require("./routes/pdf.routes.js");
-
+const aiRoutes = require("./routes/ai.routes.js");
 // Route de test
 app.get('/api/test', (req, res) => {
     res.json({ message: "BACKEND FONCTIONNEL !" });
@@ -27,7 +27,10 @@ app.get('/api/test', (req, res) => {
 app.use("/api/cv", cvRoutes);
 
 // Toutes les requêtes commençant par "/api/pdf" seront gérées par pdf.routes.js
-app.use("/api/pdf", pdfRoutes)
+app.use("/api/pdf", pdfRoutes);
+
+// Toutes les requêtes commençant par "/api/ai" seront gérées par ai.routes.js
+app.use("/api/ai", aiRoutes);
 
 // Lancement du serveur
 app.listen(PORT, () => {

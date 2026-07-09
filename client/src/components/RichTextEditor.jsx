@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
@@ -35,6 +35,13 @@ export default function RichTextEditor({ value, onChange }) {
     return null
     
   }
+
+  // Force la màj de l'éditeur quand le texte est reformulé par l'IA
+  useEffect(() => {
+    if(editor && value !== editor.getHTML()){
+      editor.commands.setContent(value)
+    }
+  }, [value, editor])
 
 
   return (
