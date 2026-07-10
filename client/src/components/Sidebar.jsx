@@ -10,7 +10,7 @@ import { LuSpellCheck } from "react-icons/lu";
 import Accordion from './Accordion'
 import RichTextEditor from "./RichTextEditor"
 
-export default function Sidebar({cvData, setCvData}){
+export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors, isCheckingSpelling, handleSpellCheck}){
 
     //STATES
     const [openAccordionsCount, setOpenAccordionsCount] = useState(0);
@@ -18,6 +18,8 @@ export default function Sidebar({cvData, setCvData}){
     const [loadingIndex, setLoadingIndex] = useState(null);
 
     const [loadingTrad, setLoadingTrad] = useState(false);
+
+
 
     
     const handleAccordionToggle = (isOpen) => {
@@ -717,9 +719,74 @@ export default function Sidebar({cvData, setCvData}){
                     
                 </button>
 
-                <button className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer flex justify-center items-center'>
-                    <LuSpellCheck className='mr-1' /> Vérifier l'orthographe
-                </button>
+                <div className="flex flex-col gap-4">
+                    
+                    
+                    <button 
+                        className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer disabled:opacity-50 flex justify-center items-center'
+                        onClick={handleSpellCheck}
+                        disabled={isCheckingSpelling}
+                    >
+                         <LuSpellCheck className='mr-1' /> {isCheckingSpelling ? "Analyse en cours..." : "Vérifier l'orthographe"}
+                    </button>
+
+                    {/* RÉSULTATS DE LA VERIFICATION*/}
+                    {spellErrors.length > 0 && (
+                        <div className="flex flex-col gap-3 mt-2">
+                            
+                            <h3 className="text-[#fccc69] text-sm font-bold border-b border-[#61310e] pb-1">
+                                Résultats de l'analyse :
+                            </h3>
+                            
+                            {spellErrors.map((err, index) => {
+                                
+                                // Isole le mot où l'erreur se trouve
+                                const wrongWord = err.context.text.substring(err.context.offset, err.context.offset + err.context.length);
+
+                                return (
+                                    <div key={index} className="bg-[#f5e3d6] rounded-md p-3 flex flex-col gap-2 shadow-sm">
+                                        
+                                        {/* Emplacement de la faute dans le CV */}
+                                        <span className="text-[10px] self-start bg-white text-[#61310e] px-2 py-0.5 rounded-full font-bold border border-[#61310e]/20">
+                                            {err.source}
+                                        </span>
+
+                                        {/* Affichage de l'erreur */}
+                                        <p className="text-sm text-gray-800">
+                                            Faute détectée : <span className="font-bold text-red-600 line-through decoration-1 decoration-red-600">{wrongWord}</span>
+                                        </p>
+
+                                        {/* Affiche la raison de l'erreur */}
+                                        <p className="text-xs text-gray-600 italic border-l-2 border-[#61310e] pl-2">
+                                            {err.message}
+                                        </p>
+
+                                        {/* Suggestions de correction */}
+                                        {err.replacements.length > 0 && (
+
+                                            <div className="flex flex-wrap gap-1 mt-1">
+
+                                                <span className="text-xs font-bold text-gray-700 mr-1 mt-1">Suggestions:</span>
+                                                
+                                                {/* N'affiche que les 3 meilleures solutions */}
+                                                {err.replacements.slice(0, 3).map((rep, idx) => (
+
+                                                    <span key={idx} className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">
+                                                        {rep.value}
+                                                    </span>
+
+                                                ))}
+
+                                            </div>
+                                        )}
+                                        
+                                    </div>
+                                );
+                            })}
+
+                        </div>
+                    )}
+                </div>
 
                     
 

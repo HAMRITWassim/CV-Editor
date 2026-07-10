@@ -83,4 +83,36 @@ const translateText = async (req, res) => {
     }
 };
 
-module.exports = { textRephrase, translateText };
+// LANGUAGETOOL API (VÉRIFICATION ORTHOGRAPHIQUE)
+const checkSpelling = async (req, res) => {
+    try {
+        const { text, lang } = req.body;
+
+        if(!text){
+            return res.status(400).json({message: "Le texte est requis pour vérifier l'orthographe."});
+        }
+
+        // LanguageTool prend un format Formulaire (URLSearchParams), pas du JSON
+        const params = new URLSearchParams();
+        params.append("text", text);
+        params.append("language", lang === "EN" ? "en-GB" : "fr")
+
+        // Appel à l'API LanguageTool
+        const response = await fetch('https://api.languagetool.org/v2/check', {
+            method: "POST",
+            body: params
+        });
+
+        const data = await response.json();
+
+        // matches --> fautes trouvées
+        res.status(200).json({errors: data.matches})
+    }
+    catch (error) {
+        console.error("Erreur LanguageTool : ", error);
+        res.status(500).json({message: "Erreur lors de la vérification orthographique."});
+    }
+};
+
+
+module.exports = { textRephrase, translateText, checkSpelling };
