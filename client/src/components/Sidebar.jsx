@@ -17,6 +17,7 @@ export default function Sidebar({cvData, setCvData}){
 
     const [loadingIndex, setLoadingIndex] = useState(null);
 
+    const [loadingTrad, setLoadingTrad] = useState(false);
 
     
     const handleAccordionToggle = (isOpen) => {
@@ -80,9 +81,16 @@ export default function Sidebar({cvData, setCvData}){
 
     }
 
-    // Fonction de traduction de tout le CV par l'API DeepL (appel au BACK)
+    // Fonction de traduction de tout le CV par l'API DeepL (appel au BACK), Alterne entre la Trad (FR>EN) et (EN>FR)
     const handleTranslateFullCV = async () => {
         try{
+            setLoadingTrad(true);
+
+            // On vérifie si on est en Français ou non pour déterminer le language cible 
+            const isCurrentlyFrench = cvData.lang === "FR";
+
+            const targetLanguage = isCurrentlyFrench ? "EN-GB" : "FR";
+
             // Fonction de traduction pour un String donné
             const translateString = async (textToTranslate) => {
                 if (!textToTranslate){
@@ -94,7 +102,7 @@ export default function Sidebar({cvData, setCvData}){
                     headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({
                         text: textToTranslate,
-                        targetLang: "EN-GB"
+                        targetLang: targetLanguage
                     }),
 
                 });
@@ -130,7 +138,7 @@ export default function Sidebar({cvData, setCvData}){
                 lang.name = await translateString(lang.name);
             }
 
-            newCV.lang = "EN";
+            newCV.lang = isCurrentlyFrench ? "EN" : "FR";
 
             setCvData(newCV);
 
@@ -141,6 +149,9 @@ export default function Sidebar({cvData, setCvData}){
         catch (error){
             console.error("Erreur lors de la traduction du CV : ", error);
             alert("Erreur lors de la traduction du CV.");
+        }
+        finally{
+            setLoadingTrad(false);
         }
     };
 
@@ -312,7 +323,7 @@ export default function Sidebar({cvData, setCvData}){
                             <div>
                                 
                                 <button
-                                className={`flex-1 px-4 py-2 mt-3 rounded-full font-bold text-[#311603] transition-colors text-sm ${
+                                className={`flex-1 px-4 py-2 mt-3 rounded-full font-bold text-[#311603] transition-all duration-150 text-sm ${
                                         loadingIndex === index 
                                         ? 'bg-gray-700 text-gray-300 cursor-not-allowed' 
                                         : 'bg-[#fccc69] hover:bg-[#ffcd86] hover:cursor-pointer'
@@ -685,10 +696,25 @@ export default function Sidebar({cvData, setCvData}){
 
                 
 
-                <button className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer flex justify-center items-center'
+                <button className={`bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer flex justify-center items-center transition-all duration-150 ${
+                                        loadingTrad === true 
+                                        ? 'bg-gray-700 text-gray-300 cursor-not-allowed' 
+                                        : 'bg-[#61310e] hover:bg-[#4a2307] hover:cursor-pointer'
+                                    }`}
+                
                 onClick={handleTranslateFullCV}
+                disabled={loadingTrad === true}
                 >
-                    <IoLanguageSharp className='mr-1' /> Traduire
+                    
+                    {loadingTrad === true 
+                    ? <SyncLoader color='#6a7282' size={5} speedMultiplier={0.7} /> 
+                    : <div className='flex justify-center items-center'><IoLanguageSharp className='mr-1' /> <p className='mr-1'>Traduire</p>
+                    
+                     {cvData.lang === "FR"
+                    ? " en Anglais"
+                    : " en Français"
+                    }</div>}
+                    
                 </button>
 
                 <button className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer flex justify-center items-center'>
