@@ -10,6 +10,7 @@ function App() {
 	// STATES
 	const [cvData, setCvData] = useState({
 		title: "",
+		lang: "FR",
 
 		personalInfo: {
 			firstName: "",

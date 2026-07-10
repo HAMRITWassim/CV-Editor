@@ -7,13 +7,24 @@ import { IoPhonePortraitOutline } from "react-icons/io5";
 export default function CVPreview({cvData, setCvData}){
 
     const translateLevel = (level) => {
-        switch(level) {
-            case "nativeLanguage": return "Langue maternelle";
-            case "bilingual": return "Bilingue / C1-C2";
-            case "intermediate": return "Intermédiaire / B1-B2";
-            case "beginner": return "Débutant / A1-A2";
+        if (cvData.lang === "FR")
+            switch(level) {
+                case "nativeLanguage": return "Langue maternelle";
+                case "bilingual": return "Bilingue / C1-C2";
+                case "intermediate": return "Intermédiaire / B1-B2";
+                case "beginner": return "Débutant / A1-A2";
+                default: return "";
+            }
+        else{
+            switch(level) {
+            case "nativeLanguage": return "Native Language";
+            case "bilingual": return "Bilingual / C1-C2";
+            case "intermediate": return "Intermediate / B1-B2";
+            case "beginner": return "Beginner / A1-A2";
             default: return "";
+            }
         }
+
     }
 
     // Transforme le format de date : "YYYY-MM" --> "MM/YYYY"
@@ -126,7 +137,7 @@ export default function CVPreview({cvData, setCvData}){
                                 <div>
 
                                     <h1 className="text-sm font-bold text-[#7f3b0a] tracking-wider uppercase mb-1">
-                                        Compétences
+                                        {cvData.lang === "EN" ? "Skills" : "Compétences"}
                                     </h1>
 
                                     <hr className="border-t border-[#e3e3e3] mb-3" />
@@ -155,7 +166,7 @@ export default function CVPreview({cvData, setCvData}){
                                 <div>
 
                                     <h1 className="text-sm font-bold text-[#7f3b0a] tracking-wider uppercase mb-1">
-                                        Langues
+                                        {cvData.lang === "EN" ? "Languages" : "Langues"}
                                     </h1>
 
                                     <hr className="border-t border-[#e3e3e3] mb-3" />
@@ -187,7 +198,7 @@ export default function CVPreview({cvData, setCvData}){
                                 {/* SECTION EXPÉRIENCES */}
                                 <div>
                                     <h1 className="text-sm font-bold text-[#7f3b0a] tracking-wider uppercase mb-1">
-                                        Expériences Pro.
+                                        {cvData.lang === "EN" ? "Work Experience" : "Expériences Pro."}
                                     </h1>
                                     <hr className="border-t border-[#e3e3e3] mb-4" />
                                     
@@ -232,7 +243,7 @@ export default function CVPreview({cvData, setCvData}){
                                 <div>
 
                                     <h1 className="text-sm font-bold text-[#7f3b0a] tracking-wider uppercase mb-1">
-                                        Formations
+                                        {cvData.lang === "EN" ? "Education" : "Formations"}
                                     </h1>
 
                                     <hr className="border-t border-[#e3e3e3] mb-4" />

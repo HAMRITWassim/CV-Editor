@@ -1,10 +1,18 @@
 const { OpenAI } = require("openai");
+const deepl = require('deepl-node');
 
+
+// INITIALISATIONS
 const openai = new OpenAI({
     apiKey: process.env.GROQ_API_KEY,
     baseURL: "https://api.groq.com/openai/v1"
 })
 
+const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
+
+
+
+// OPENAI API (REFORMULATION)
 const textRephrase = async (req,res) => {
     try {
         const { text } = req.body;
@@ -53,4 +61,26 @@ const textRephrase = async (req,res) => {
     }
 }
 
-module.exports = { textRephrase };
+// DEEPL API (TRADUCTION)
+const translateText = async (req, res) => {
+    try {
+        // le FRONT envoie le texte et la langue de traduction cible
+        const {text, targetLang} = req.body;
+
+        if (!text || !targetLang){
+            return res.status(400).json({message: "Le texte et la langue cible sont requis !"});
+        }
+
+        // Appel à l'API DEEPL (null --> détection automatique de la langue d'origine)
+        const result = await translator.translateText(text, null, targetLang);
+
+        res.status(200).json({translatedText: result.text});
+
+    }
+    catch (error) {
+        console.error("Erreur DeepL: ", error);
+        res.status(500).json({message: "Erreur lors de la traduction."});
+    }
+};
+
+module.exports = { textRephrase, translateText };

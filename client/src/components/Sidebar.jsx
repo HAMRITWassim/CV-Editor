@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { SyncLoader } from "react-spinners";
 
+// ICONES 
+import { IoLanguageSharp } from "react-icons/io5";
+import { LuSpellCheck } from "react-icons/lu";
+
 
 // COMPONENTS
 import Accordion from './Accordion'
@@ -76,6 +80,69 @@ export default function Sidebar({cvData, setCvData}){
 
     }
 
+    // Fonction de traduction de tout le CV par l'API DeepL (appel au BACK)
+    const handleTranslateFullCV = async () => {
+        try{
+            // Fonction de traduction pour un String donné
+            const translateString = async (textToTranslate) => {
+                if (!textToTranslate){
+                    return "";
+                }
+                
+                const response = await fetch("http://localhost:5000/api/ai/traduire", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        text: textToTranslate,
+                        targetLang: "EN-GB"
+                    }),
+
+                });
+                const data = await response.json();
+                return data.translatedText;
+            };
+
+            // Copie du CV
+            const newCV = JSON.parse(JSON.stringify(cvData));
+
+            // TRADUCTION DES CHAMPS (champs exclus: Nom, Prénom, Email, Tel, Nom de l'école et de l'entreprise)
+            newCV.title = await translateString(newCV.title);
+            newCV.personalInfo.jobTitle = await translateString(newCV.personalInfo.jobTitle);
+
+            // Boucle sur les Expériences
+            for (let exp of newCV.experiences){
+                exp.position = await translateString(exp.position);
+                exp.description = await translateString(exp.description);
+            }
+
+            // Boucle sur les Formations
+            for (let edu of newCV.education){
+                edu.degree = await translateString(edu.degree);
+            }
+
+            // Boucle sur les Compétences
+            for (let skill of newCV.skills){
+                skill.name = await translateString(skill.name);
+            }
+
+            // Boucle sur les Langues
+            for (let lang of newCV.languages){
+                lang.name = await translateString(lang.name);
+            }
+
+            newCV.lang = "EN";
+
+            setCvData(newCV);
+
+            console.log("Traduction du CV terminée avec succès !");
+
+
+        }
+        catch (error){
+            console.error("Erreur lors de la traduction du CV : ", error);
+            alert("Erreur lors de la traduction du CV.");
+        }
+    };
 
     return (
         <aside className={`flex flex-col left-0 relative z-10 h-full ${openAccordionsCount > 0 ? "w-90" : "w-40"} bg-[#311603] pt-10 overflow-y-auto scrollbar-none shrink-0 transition-all duration-300`}>
@@ -550,7 +617,7 @@ export default function Sidebar({cvData, setCvData}){
                                 >
                                     <option value="" disabled>Sélectionner un niveau</option>
                                     <option value="nativeLanguage">Langue maternelle</option>
-                                    <option value="biligual">Bilingue/Courant (C1/C2)</option>
+                                    <option value="bilingual">Bilingue/Courant (C1/C2)</option>
                                     <option value="intermediate">Intermédiaire(B1/B2)</option>
                                     <option value="beginner">Débutant(A1/A2)</option>
 
@@ -618,12 +685,14 @@ export default function Sidebar({cvData, setCvData}){
 
                 
 
-                <button className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer'>
-                    Traduire
+                <button className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer flex justify-center items-center'
+                onClick={handleTranslateFullCV}
+                >
+                    <IoLanguageSharp className='mr-1' /> Traduire
                 </button>
 
-                <button className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer'>
-                    Vérifier l'orthographe
+                <button className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer flex justify-center items-center'>
+                    <LuSpellCheck className='mr-1' /> Vérifier l'orthographe
                 </button>
 
                     
