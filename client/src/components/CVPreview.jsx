@@ -145,9 +145,9 @@ export default function CVPreview({cvData, setCvData}){
                                     <ul className="flex flex-col gap-2">
 
                                         {cvData.skills.length > 0 ? (
-                                            cvData.skills.map((skill) => (
+                                            cvData.skills.map((skill, index) => (
 
-                                                <li key={skill.id} className="text-sm text-gray-700 font-medium flex items-center overflow-clip">
+                                                <li key={skill._id || skill.id || index} className="text-sm text-gray-700 font-medium flex items-center overflow-clip">
                                                     
                                                     <span className="w-1.5 h-1.5 bg-[#7f3b0a] rounded-full mr-2"></span>
                                                     {skill.name}
@@ -174,9 +174,9 @@ export default function CVPreview({cvData, setCvData}){
                                     <ul className="flex flex-col gap-3">
                                         
                                         {cvData.languages.length > 0 ? (
-                                            cvData.languages.map((language) => (
+                                            cvData.languages.map((language, index) => (
 
-                                                <li key={language.id} className="text-sm overflow-clip">
+                                                <li key={language._id || language.id || index} className="text-sm overflow-clip">
                                                     <p className="font-bold text-gray-800">{language.name}</p>
                                                     <p className="text-xs text-gray-500 italic">{translateLevel(language.level)}</p>
                                                 </li>
@@ -205,9 +205,9 @@ export default function CVPreview({cvData, setCvData}){
                                     <div className="flex flex-col gap-5">
 
                                         {cvData.experiences.length > 0 ? (
-                                            cvData.experiences.map((experience) => (
+                                            cvData.experiences.map((experience, index) => (
 
-                                                <div key={experience.id} className="flex flex-col">
+                                                <div key={experience._id || experience.id || index} className="flex flex-col">
                                                     
                                                     {/* En-tête de l'expérience (Titre, date..)*/}
                                                     <div className="flex justify-between items-baseline mb-1">
@@ -251,9 +251,9 @@ export default function CVPreview({cvData, setCvData}){
                                     <div className="flex flex-col gap-4">
 
                                         {cvData.education.length > 0 ? (
-                                            cvData.education.map((formation) => (
+                                            cvData.education.map((formation, index) => (
 
-                                                <div key={formation.id} className="flex flex-col">
+                                                <div key={formation._id || formation.id || index} className="flex flex-col">
 
                                                     <div className="flex justify-between items-baseline mb-1">
 

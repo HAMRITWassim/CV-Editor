@@ -245,7 +245,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
                     {cvData.experiences.map((experience, index) => (
 
-                        <div key={experience.id} className="mb-8 pb-4 border-b border-[#61310e]/30">
+                        <div key={experience._id || experience.id || index} className="mb-8 pb-4 border-b border-[#61310e]/30">
 
                             <h3 className="text-lg font-bold mb-4 text-[#fccc69]">
                                 Expérience n°{index + 1}
@@ -402,7 +402,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                 <Accordion title="Formations">
                     {cvData.education.map((formation, index) => (
 
-                        <div key={formation.id} className="mb-8 pb-4 border-b border-[#61310e]/30">
+                        <div key={formation._id || formation.id || index} className="mb-8 pb-4 border-b border-[#61310e]/30">
 
                             <h3 className="text-lg font-bold mb-4 text-[#fccc69]">
                                 Formation n°{index + 1}
@@ -526,7 +526,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                     
                     {cvData.skills.map((skill, index) => (
 
-                        <div key={skill.id} className="mb-8 pb-4 border-b border-[#61310e]/30">
+                        <div key={skill._id || skill.id || index} className="mb-8 pb-4 border-b border-[#61310e]/30">
 
 
                             <div>
@@ -600,7 +600,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                     
                     {cvData.languages.map((language, index) => (
 
-                        <div key={language.id} className="mb-8 pb-4 border-b border-[#61310e]/30">
+                        <div key={language._id || language.id || index} className="mb-8 pb-4 border-b border-[#61310e]/30">
 
 
                             <div>

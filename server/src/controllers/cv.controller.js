@@ -7,7 +7,7 @@ const saveCV = async(req, res) => {
             {},
             req.body,
             {
-                new: true,
+                returnDocument: "after",
                 upsert: true,
                 runValidators: true
             }
