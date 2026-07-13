@@ -3,6 +3,32 @@ import cvLogo from '../assets/cv2.png'
 
 export default function Header({cvData, setCvData}){
 
+    // Gère la sauvegarde du CV
+    const handleSaveCV = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/api/cv/save", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(cvData)
+            });
+
+            const data = await response.json();
+
+            if(response.ok){
+                alert("✅ CV sauvegardé avec succès !");
+            }
+            
+            else{   // Il manque les champs "required" du modèles Mongoose
+                alert(`❌ Erreur: ${data.error}`);
+            }
+        }
+        
+        catch (error) {
+            console.error("Erreur réseau: ", error);
+            alert("Impossible de joindre le serveur.");
+        }
+    };
+
     // Gère l'export du PDF
     const handleExportPDF = async () => {
         try {
@@ -66,10 +92,20 @@ export default function Header({cvData, setCvData}){
             
             </h1>
 
-            <div className=' flex-1 flex justify-end pr-6'>
-                
+            <div className=' flex-1 flex justify-end pr-6 gap-3'>
+
+                {/* BOUTON SAUVEGARDER */}
                 <button
-                className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer'
+                    className='bg-transparent border-2 border-[#61310e] px-4 py-2 rounded-full font-bold text-[#61310e] hover:bg-[#61310e]/10 transition-colors cursor-pointer'
+                    onClick={handleSaveCV}
+                >
+                    Sauvegarder
+                </button>
+                
+
+                {/* BOUTON EXPORT PDF */}
+                <button
+                className='bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer hover:bg-[#452006] transition-colors'
                 onClick={handleExportPDF}
                 >
                     Exporter en PDF

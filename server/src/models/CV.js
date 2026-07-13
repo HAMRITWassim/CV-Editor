@@ -10,6 +10,12 @@ const cvSchema = new mongoose.Schema({
         default: "Mon CV"
     },
 
+    // Langue du CV
+    lang: {
+        type: String,
+        default: "FR"
+    },
+
     // Informations personnelles (sous-obj)
     personalInfo: {
         firstName: {type: String, required: true},
@@ -21,6 +27,7 @@ const cvSchema = new mongoose.Schema({
 
     // Expériences (tableau de sous-obj)
     experiences: [{
+        id: String,
         position: String,
         company: String,
         startDate: String,
@@ -30,6 +37,7 @@ const cvSchema = new mongoose.Schema({
 
     // Formations
     education: [{
+        id: String,
         degree: String,
         school: String,
         startDate: String,
@@ -37,7 +45,10 @@ const cvSchema = new mongoose.Schema({
     }],
 
     // Compétences (liste de mots)
-    skills: [String],
+    skills: [{
+        id: String,
+        name: String
+    }],
 
     // Langues
     languages: [{

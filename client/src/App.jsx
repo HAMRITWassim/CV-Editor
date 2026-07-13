@@ -5,6 +5,10 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import CVPreview from './components/CVPreview';
 
+// ICONES
+import { MoonLoader } from "react-spinners";
+
+
 function App() {
 
 	// STATES
@@ -27,6 +31,33 @@ function App() {
 
 	const [isCheckingSpelling, setIsCheckingSpelling] = useState(false);
     const [spellErrors, setSpellErrors] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	// Lors du chargement de la page -> Lit le dernier CV dans la BDD, et le charge (rempalce les champs du CV par les valeurs dans la BDD)
+	useEffect(() => {
+		const loadCV = async () => {
+			try {
+				// Appelle route GET
+				const response = await fetch("http://localhost:5000/api/cv");
+				
+
+				if(response.ok){
+					const data = await response.json();
+					setCvData(data); // On utilise les données MongoDB pour remplir la page
+				}
+			}
+			
+			catch (error) {
+				console.error("Erreur de connexion au serveur: ", error);
+			}
+
+			finally{
+				setIsLoading(false); // Désactive le chargement
+			}
+		}
+
+	loadCV();
+	},  []) // [] --> Appel une fois au démarrage
 
 
 	const handleSpellCheck = async () => {
@@ -124,8 +155,20 @@ function App() {
 		}
 	};
 	
+	// Écran de chargement en attendant la récupération du CV
+	if(isLoading){
+		return(
+			<div className='flex justify-center items-center h-screen'>
+				<div className='flex flex-col justify-center items-center gap-4'>
+					<MoonLoader />
+					<h1 className='text-xl'>Chargement de votre CV...</h1>
+				</div>
+				
+			</div>
+		)
+	}
 
-  return (
+  	return (
 		<>
 			<div className='bg-[#EFE9E3] h-screen flex flex-col overflow-hidden'>
 
@@ -153,8 +196,8 @@ function App() {
 
 			</div>
     
-    </>
-  )
+    	</>
+  	)
 }
 
 export default App

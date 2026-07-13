@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { SyncLoader } from "react-spinners";
 
 // ICONES 
 import { IoLanguageSharp } from "react-icons/io5";
 import { LuSpellCheck } from "react-icons/lu";
+import { SyncLoader } from "react-spinners";
+
 
 
 // COMPONENTS
@@ -161,7 +162,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
         <aside className={`flex flex-col left-0 relative z-10 h-full ${openAccordionsCount > 0 ? "w-90" : "w-40"} bg-[#311603] pt-10 overflow-y-auto scrollbar-none shrink-0 transition-all duration-300`}>
 
             <Accordion 
-            title="INFORMATIONS" 
+            title="Informations" 
             onClick={(isOpen) => handleAccordionToggle(isOpen) }
             isSidebarOpen={openAccordionsCount > 0}
             >
@@ -169,7 +170,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                     <div>
                         <h2>Nom</h2>
                         <input 
-                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none" 
+                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none"  
                         type="text" 
                         placeholder="Example" 
                         value={cvData.personalInfo.lastName}
@@ -698,27 +699,8 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
                 
 
-                <button className={`bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer flex justify-center items-center transition-all duration-150 ${
-                                        loadingTrad === true 
-                                        ? 'bg-gray-700 text-gray-300 cursor-not-allowed' 
-                                        : 'bg-[#61310e] hover:bg-[#4a2307] hover:cursor-pointer'
-                                    }`}
-                
-                onClick={handleTranslateFullCV}
-                disabled={loadingTrad === true}
-                >
-                    
-                    {loadingTrad === true 
-                    ? <SyncLoader color='#6a7282' size={5} speedMultiplier={0.7} /> 
-                    : <div className='flex justify-center items-center'><IoLanguageSharp className='mr-1' /> <p className='mr-1'>Traduire</p>
-                    
-                     {cvData.lang === "FR"
-                    ? " en Anglais"
-                    : " en Français"
-                    }</div>}
-                    
-                </button>
 
+                {/* BOUTON DE VÉRIFICATION ORTHOGRAPHIQUE */}
                 <div className="flex flex-col gap-4">
                     
                     
@@ -787,6 +769,28 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                         </div>
                     )}
                 </div>
+                    
+                {/* BOUTON TRADUCTION FR <-> EN */}
+                <button className={`bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer flex justify-center items-center transition-all duration-150 ${
+                        loadingTrad === true 
+                        ? 'bg-gray-700 text-gray-300 cursor-not-allowed' 
+                        : 'bg-[#61310e] hover:bg-[#4a2307] hover:cursor-pointer'
+                    }`}
+                
+                onClick={handleTranslateFullCV}
+                disabled={loadingTrad === true}
+                >
+                    
+                    {loadingTrad === true 
+                    ? <SyncLoader color='#6a7282' size={5} speedMultiplier={0.7} /> 
+                    : <div className='flex justify-center items-center'><IoLanguageSharp className='mr-1' /> <p className='mr-1'>Traduire</p>
+                    
+                     {cvData.lang === "FR"
+                    ? " en Anglais"
+                    : " en Français"
+                    }</div>}
+                    
+                </button>
 
                     
 
