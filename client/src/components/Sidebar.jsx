@@ -184,18 +184,19 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
     }
 
     return (
-        <aside className={`flex flex-col left-0 relative z-10 h-full ${openAccordionsCount > 0 ? "w-90" : "w-40"} bg-[#311603] pt-10 overflow-y-auto scrollbar-none shrink-0 transition-all duration-300`}>
+        <aside className={`flex flex-col left-0 relative z-10 h-full ${openAccordionsCount > 0 ? "w-110" : "w-46"} bg-[#311603] pt-10 overflow-y-auto scrollbar-none shrink-0 transition-all duration-300`}>
 
             <Accordion 
             title="Informations" 
             onClick={(isOpen) => handleAccordionToggle(isOpen) }
             isSidebarOpen={openAccordionsCount > 0}
+            variant={"main"}
             >
-                <Accordion title="Informations Personnelles">
+                <Accordion title="Informations Personnelles" variant={"secondary"}>
                     <div>
                         <h2>Nom</h2>
                         <input 
-                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none"  
+                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"  
                         type="text" 
                         placeholder="Example" 
                         value={cvData.personalInfo.lastName}
@@ -211,7 +212,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                         <input 
                         type="text" 
                         placeholder="Example" 
-                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none"
+                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
                         value={cvData.personalInfo.firstName}
                         onChange={(e) => setCvData({
                             ...cvData,
@@ -225,7 +226,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                         <input 
                         type="email" 
                         placeholder="ex: example@test.com" 
-                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none" 
+                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
                         value={cvData.personalInfo.email}
                         onChange={(e) => setCvData({
                             ...cvData,
@@ -239,7 +240,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                         <input 
                         type="tel" 
                         placeholder="ex: 06 07 08 09 10" 
-                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none" 
+                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
                         value={cvData.personalInfo.phone}
                         onChange={(e) => setCvData({
                             ...cvData,
@@ -253,7 +254,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                         <input 
                         type="text" 
                         placeholder="ex: Développeur Front" 
-                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none" 
+                        className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
                         value={cvData.personalInfo.jobTitle}
                         onChange={(e) => setCvData({
                             ...cvData,
@@ -265,7 +266,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                 </Accordion>
 
 
-                <Accordion title="Expériences">
+                <Accordion title="Expériences" variant={"secondary"}>
 
 
                     {cvData.experiences.map((experience, index) => (
@@ -274,7 +275,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
                             <div className='flex justify-center items-center mb-4'>
 
-                                <h3 className="text-lg font-bold  text-[#fccc69] flex flex-1 justify-start ">
+                                <h3 className="text-base font-bold text-[#fccc69] flex flex-1 justify-start ">
                                     Expérience n°{index + 1}
                                 </h3>
 
@@ -282,7 +283,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                                     
                                     <button
                                     className={`border rounded-full p-0.5  bg-transparent ${index === 0 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"}  transition-colors duration-100`}
-                                    onClick={() => moveItem("education", index, "up")}
+                                    onClick={() => moveItem("experiences", index, "up")}
                                     disabled={index===0}
                                     >
                                         <IoArrowUp />
@@ -450,14 +451,14 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
                 </Accordion>
 
-                <Accordion title="Formations">
+                <Accordion title="Formations" variant={"secondary"}>
                     {cvData.education.map((formation, index) => (
 
                         <div key={formation._id || formation.id || index} className="mb-8 pb-4 border-b border-[#61310e]/30">
 
                             <div className='flex justify-center items-center mb-4'>
 
-                                <h3 className="text-lg font-bold  text-[#fccc69] flex flex-1">
+                                <h3 className="text-base font-bold  text-[#fccc69] flex flex-1">
                                     Formation n°{index + 1}
                                 </h3>
                                 
@@ -598,7 +599,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
 
 
-                <Accordion title="Compétences">
+                <Accordion title="Compétences" variant={"secondary"}>
                     
                     {cvData.skills.map((skill, index) => (
 
@@ -609,7 +610,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
                                 <div className='flex justify-center items-center mb-4'>
                                 
-                                    <h3 className="text-md flex flex-1 justify-start text-md font-bold  text-[#fccc69]">
+                                    <h3 className="text-base flex flex-1 justify-start font-bold  text-[#fccc69]">
                                         Compétence n°{index+1}
                                     </h3>
 
@@ -700,7 +701,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
 
 
-                <Accordion title="Langues">
+                <Accordion title="Langues" variant={"secondary"}>
                     
                     {cvData.languages.map((language, index) => (
 
@@ -829,6 +830,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
             title="Fonctionnalités IA"
             onClick={(isOpen) => handleAccordionToggle(isOpen)}
             isSidebarOpen={openAccordionsCount > 0}
+            variant={"main"}
             >
 
                 
