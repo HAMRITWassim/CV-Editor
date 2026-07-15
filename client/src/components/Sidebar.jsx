@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 // ICONES 
-import { IoLanguageSharp } from "react-icons/io5";
+import { IoLanguageSharp, IoArrowUp, IoArrowDown } from "react-icons/io5";
 import { LuSpellCheck } from "react-icons/lu";
 import { SyncLoader } from "react-spinners";
 
@@ -158,6 +158,31 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
         }
     };
 
+    // Fonction pour monter/descendre un élément d'une liste (selon la section)
+    const moveItem = (sectionName, index, direction) => {
+        // Copie du tableau (selon la section)
+        const newArray = [...cvData[sectionName]]
+
+        // MONTER
+        if (direction === "up" && index > 0){
+            [newArray[index - 1], newArray[index]] = [newArray[index], newArray[index - 1]];    //inversion des éléments
+        }
+
+        // DESCENDRE
+        else if (direction === "down" && index < newArray.length - 1){
+            [newArray[index + 1], newArray[index]] = [newArray[index], newArray[index + 1]];
+        }
+
+        // Mouvement invalide
+        else{
+            return; 
+        }
+
+        // Màj du State
+        setCvData({...cvData, [sectionName]: newArray});
+
+    }
+
     return (
         <aside className={`flex flex-col left-0 relative z-10 h-full ${openAccordionsCount > 0 ? "w-90" : "w-40"} bg-[#311603] pt-10 overflow-y-auto scrollbar-none shrink-0 transition-all duration-300`}>
 
@@ -247,9 +272,35 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
                         <div key={experience._id || experience.id || index} className="mb-8 pb-4 border-b border-[#61310e]/30">
 
-                            <h3 className="text-lg font-bold mb-4 text-[#fccc69]">
-                                Expérience n°{index + 1}
-                            </h3>
+                            <div className='flex justify-center items-center mb-4'>
+
+                                <h3 className="text-lg font-bold  text-[#fccc69] flex flex-1 justify-start ">
+                                    Expérience n°{index + 1}
+                                </h3>
+
+                                <div className='flex  items-center gap-4 text-xl'>
+                                    
+                                    <button
+                                    className={`border rounded-full p-0.5  bg-transparent ${index === 0 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"}  transition-colors duration-100`}
+                                    onClick={() => moveItem("education", index, "up")}
+                                    disabled={index===0}
+                                    >
+                                        <IoArrowUp />
+                                    </button>
+
+
+                                    <button
+                                    className={`border rounded-full p-0.5  bg-transparent ${index === cvData.experiences.length - 1 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"} transition-colors duration-100`}
+                                    onClick={() => moveItem("experiences", index, "down")}
+                                    disabled={index === cvData.education.length - 1}
+                                    >
+                                        <IoArrowDown />
+                                    </button>
+
+                                </div>
+
+                            </div>
+                                
 
                             <div>
                                 <h2>Intitulé du poste</h2>
@@ -404,10 +455,35 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
                         <div key={formation._id || formation.id || index} className="mb-8 pb-4 border-b border-[#61310e]/30">
 
-                            <h3 className="text-lg font-bold mb-4 text-[#fccc69]">
-                                Formation n°{index + 1}
-                            </h3>
+                            <div className='flex justify-center items-center mb-4'>
 
+                                <h3 className="text-lg font-bold  text-[#fccc69] flex flex-1">
+                                    Formation n°{index + 1}
+                                </h3>
+                                
+                                <div className='flex  items-center gap-4 text-xl'>
+                                    
+                                    <button
+                                    className={`border rounded-full p-0.5  bg-transparent ${index === 0 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"}  transition-colors duration-100`}
+                                    onClick={() => moveItem("education", index, "up")}
+                                    disabled={index===0}
+                                    >
+                                        <IoArrowUp />
+                                    </button>
+
+
+                                    <button
+                                    className={`border rounded-full p-0.5  bg-transparent ${index === cvData.education.length - 1 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"} transition-colors duration-100`}
+                                    onClick={() => moveItem("education", index, "down")}
+                                    disabled={index === cvData.education.length - 1}
+                                    >
+                                        <IoArrowDown />
+                                    </button>
+
+                                </div>
+
+
+                            </div>
                             <div>
                                 <h2>Intitulé du diplôme</h2>
                                 <input 
@@ -530,7 +606,35 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
 
                             <div>
-                                <h2>Compétence n°{index+1}</h2>
+
+                                <div className='flex justify-center items-center mb-4'>
+                                
+                                    <h3 className="text-md flex flex-1 justify-start text-md font-bold  text-[#fccc69]">
+                                        Compétence n°{index+1}
+                                    </h3>
+
+                                    <div className='flex  items-center gap-4 text-xl'>
+                                        
+                                        <button
+                                        className={`border rounded-full p-0.5  bg-transparent ${index === 0 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"}  transition-colors duration-100`}
+                                        onClick={() => moveItem("skills", index, "up")}
+                                        disabled={index===0}
+                                        >
+                                            <IoArrowUp />
+                                        </button>
+
+
+                                        <button
+                                        className={`border rounded-full p-0.5  bg-transparent ${index === cvData.skills.length - 1 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"} transition-colors duration-100`}
+                                        onClick={() => moveItem("skills", index, "down")}
+                                        disabled={index === cvData.skills.length - 1}
+                                        >
+                                            <IoArrowDown />
+                                        </button>
+
+                                </div>
+
+                            </div>
                                 <input 
                                 type="text" 
                                 placeholder="ex: React.js" 
@@ -603,8 +707,38 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                         <div key={language._id || language.id || index} className="mb-8 pb-4 border-b border-[#61310e]/30">
 
 
+                            <div className='flex justify-center items-center mb-4'>
+                                
+                                    <h3 className="text-md flex flex-1 justify-start text-lg font-bold  text-[#fccc69]">
+                                        Langue n°{index+1}
+                                    </h3>
+
+                                    <div className='flex  items-center gap-4 text-xl'>
+                                        
+                                        <button
+                                        className={`border rounded-full p-0.5  bg-transparent ${index === 0 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"}  transition-colors duration-100`}
+                                        onClick={() => moveItem("languages", index, "up")}
+                                        disabled={index===0}
+                                        >
+                                            <IoArrowUp />
+                                        </button>
+
+
+                                        <button
+                                        className={`border rounded-full p-0.5  bg-transparent ${index === cvData.languages.length - 1 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"} transition-colors duration-100`}
+                                        onClick={() => moveItem("languages", index, "down")}
+                                        disabled={index === cvData.languages.length - 1}
+                                        >
+                                            <IoArrowDown />
+                                        </button>
+
+                                </div>
+
+                            </div>
+
+
                             <div>
-                                <h2>Langue n°{index+1}</h2>
+                                <h2>Nom</h2>
                                 <input 
                                 type="text" 
                                 placeholder="ex: Anglais" 
