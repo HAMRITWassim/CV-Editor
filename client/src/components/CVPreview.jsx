@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { IoPhonePortraitOutline } from "react-icons/io5";
 
+import { THEMES } from "../constants/themes"
+
 export default function CVPreview({cvData, setCvData}){
+
+    const currentTheme = THEMES[cvData.theme || "marron"]
 
     const translateLevel = (level) => {
         if (cvData.lang === "FR")
@@ -96,7 +100,11 @@ export default function CVPreview({cvData, setCvData}){
                 }}
             >
                 {/* FEUILLE BLANCHE */}
-                <div id="cv-to-print" className="bg-white shadow-2xl p-10 flex flex-col w-full h-full">
+                <div 
+                id="cv-to-print" 
+                className="bg-white shadow-2xl p-10 flex flex-col w-full h-full"
+                style={{ fontFamily: currentTheme.font }}
+                >
 
                     {/* HEADER */}
                     <header className="flex flex-col items-start gap-1">
@@ -106,7 +114,7 @@ export default function CVPreview({cvData, setCvData}){
                             cvData.personalInfo.firstName || "Prénom"} 
                         </h1>
 
-                        <h2 className="text-xl text-[#7f3b0a] font-bold text-center">
+                        <h2 className="text-xl font-bold text-center" style={{ color: currentTheme.primary }}>
                             {cvData.personalInfo.jobTitle || "Titre du poste"}
                         </h2>
 
@@ -136,7 +144,7 @@ export default function CVPreview({cvData, setCvData}){
                                 {/* SECTION COMPÉTENCES */}
                                 <div>
 
-                                    <h1 className="text-sm font-bold text-[#7f3b0a] tracking-wider uppercase mb-1">
+                                    <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: currentTheme.primary }}>
                                         {cvData.lang === "EN" ? "Skills" : "Compétences"}
                                     </h1>
 
@@ -149,7 +157,7 @@ export default function CVPreview({cvData, setCvData}){
 
                                                 <li key={skill._id || skill.id || index} className="text-sm text-gray-700 font-medium flex items-center overflow-clip">
                                                     
-                                                    <span className="w-1.5 h-1.5 bg-[#7f3b0a] rounded-full mr-2"></span>
+                                                    <span className="w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: currentTheme.primary }}></span>
                                                     {skill.name}
 
                                                 </li>
@@ -165,7 +173,7 @@ export default function CVPreview({cvData, setCvData}){
                                 {/* SECTION LANGUES */}
                                 <div>
 
-                                    <h1 className="text-sm font-bold text-[#7f3b0a] tracking-wider uppercase mb-1">
+                                    <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: currentTheme.primary }}>
                                         {cvData.lang === "EN" ? "Languages" : "Langues"}
                                     </h1>
 
@@ -197,7 +205,7 @@ export default function CVPreview({cvData, setCvData}){
                                 
                                 {/* SECTION EXPÉRIENCES */}
                                 <div>
-                                    <h1 className="text-sm font-bold text-[#7f3b0a] tracking-wider uppercase mb-1">
+                                    <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: currentTheme.primary }}>
                                         {cvData.lang === "EN" ? "Work Experience" : "Expériences Pro."}
                                     </h1>
                                     <hr className="border-t border-[#e3e3e3] mb-4" />
@@ -214,7 +222,7 @@ export default function CVPreview({cvData, setCvData}){
 
                                                         <h3 className="font-bold text-gray-900">{experience.position || "Poste"}</h3>
 
-                                                        <span className="text-xs font-semibold text-[#7f3b0a] rounded-md bg-[#f5e3d6] px-1 py-0.5 whitespace-nowrap shrink-0">
+                                                        <span className="text-xs font-semibold rounded-md px-1 py-0.5 whitespace-nowrap shrink-0" style={{ color: currentTheme.primary, backgroundColor: currentTheme.light }}>
                                                             {toNumericDateFormat(experience.startDate)} {toNumericDateFormat(experience.startDate) && toNumericDateFormat(experience.endDate) && " - "} {toNumericDateFormat(experience.endDate)}
                                                         </span>
 
@@ -242,7 +250,7 @@ export default function CVPreview({cvData, setCvData}){
                                 {/* SECTION FORMATIONS */}
                                 <div>
 
-                                    <h1 className="text-sm font-bold text-[#7f3b0a] tracking-wider uppercase mb-1">
+                                    <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: currentTheme.primary }}>
                                         {cvData.lang === "EN" ? "Education" : "Formations"}
                                     </h1>
 
@@ -259,7 +267,7 @@ export default function CVPreview({cvData, setCvData}){
 
                                                         <h3 className="font-bold text-gray-900">{formation.degree || "Diplôme"}</h3>
 
-                                                        <span className="text-xs font-semibold text-[#7f3b0a] rounded-md bg-[#f5e3d6] px-1 py-0.5 whitespace-nowrap shrink-0">
+                                                        <span className="text-xs font-semibold rounded-md px-1 py-0.5 whitespace-nowrap shrink-0" style={{ color: currentTheme.primary, backgroundColor: currentTheme.light }}>
                                                             {toNumericDateFormat(formation.startDate)} {toNumericDateFormat(formation.startDate) && toNumericDateFormat(formation.endDate) && " - "} {toNumericDateFormat(formation.endDate)}
                                                         </span>
 

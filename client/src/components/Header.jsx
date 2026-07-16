@@ -1,4 +1,4 @@
-import cvLogo from '../assets/cv2.png'
+import cvLogo from '../assets/cv_icon.png'
 
 
 export default function Header({cvData, setCvData}){

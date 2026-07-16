@@ -5,11 +5,12 @@ import { IoLanguageSharp, IoArrowUp, IoArrowDown } from "react-icons/io5";
 import { LuSpellCheck } from "react-icons/lu";
 import { SyncLoader } from "react-spinners";
 
-
-
 // COMPONENTS
 import Accordion from './Accordion'
 import RichTextEditor from "./RichTextEditor"
+
+import { THEMES } from "../constants/themes"
+
 
 export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors, isCheckingSpelling, handleSpellCheck}){
 
@@ -182,6 +183,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
         setCvData({...cvData, [sectionName]: newArray});
 
     }
+
 
     return (
         <aside className={`flex flex-col left-0 relative z-10 h-full ${openAccordionsCount > 0 ? "w-110" : "w-46"} bg-[#311603] pt-10 overflow-y-auto scrollbar-none shrink-0 transition-all duration-300`}>
@@ -929,6 +931,34 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                 </button>
 
                     
+
+            </Accordion>
+
+            {/* STYLE */}
+            <Accordion
+            title={"Style"}
+            variant={"main"}
+            onClick={(isOpen) => handleAccordionToggle(isOpen)}
+            isSidebarOpen={openAccordionsCount > 0}
+            >
+                <div className="flex justify-evenly items-center py-2">
+
+                    {/* Transforme THEMES en tableau pour boucler dessus*/}
+                    {Object.entries(THEMES).map(([themeKey, themeValues]) => (
+                        <button 
+                            key={themeKey}
+                            className={`
+                                w-10 h-10 rounded-full border-2 transition-all duration-200 
+                                cursor-pointer hover:shadow-lg shad
+                                ${cvData.theme === themeKey ? "border-white scale-110 shadow-md  ring-white/30" : "border-black/50 opacity-80"}
+                            `}
+                            style={{ backgroundColor: themeValues.primary }}
+                            onClick={() => setCvData({...cvData, theme: themeKey})}
+                            title={themeValues.name}
+                        />
+                    ))}
+
+                </div>
 
             </Accordion>
 

@@ -16,6 +16,12 @@ const cvSchema = new mongoose.Schema({
         default: "FR"
     },
 
+    // Thème couleur du CV
+    theme: {
+        type: String,
+        default: "marron"
+    },
+
     // Informations personnelles (sous-obj)
     personalInfo: {
         firstName: {type: String, required: true},

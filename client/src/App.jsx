@@ -15,6 +15,7 @@ function App() {
 	const [cvData, setCvData] = useState({
 		title: "",
 		lang: "FR",
+		theme: "marron",
 
 		personalInfo: {
 			firstName: "",
