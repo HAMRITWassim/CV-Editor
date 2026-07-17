@@ -5,3 +5,8 @@ export const THEMES = {
     vert: { name: "Vert Émeraude", primary: "#064e3b", light: "#d1fae5", font: "ui-sans-serif, system-ui, sans-serif" },
     noir: { name: "Noir Classique", primary: "#171717", light: "#f3f4f6", font: "'Times New Roman', Times, serif" }
 };
+
+export const DEFAULT_LAYOUT = [
+    { id: "col-small", size: 1, items: ["skills", "languages"] },
+    { id: "col-large", size: 2, items: ["experiences", "education"] }
+]

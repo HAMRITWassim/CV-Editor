@@ -16,6 +16,10 @@ function App() {
 		title: "",
 		lang: "FR",
 		theme: "marron",
+		layout: [
+            { id: "col-small", size: 1, items: ["skills", "languages"] },
+            { id: "col-large", size: 2, items: ["experiences", "education"] }
+        ],
 
 		personalInfo: {
 			firstName: "",

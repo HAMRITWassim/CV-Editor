@@ -22,6 +22,17 @@ const cvSchema = new mongoose.Schema({
         default: "marron"
     },
 
+    // Structure des blocs du CV
+    layout: {
+        type: Array,
+
+        // Par défaut: Petite Colonne (Gauche) + Grande Colonne (Droite)
+        default: [
+            { id: "col-small", size: 1, items: ["skills", "languages"] },
+            { id: "col-large", size: 2, items: ["experiences", "education"] }
+        ]
+    },
+
     // Informations personnelles (sous-obj)
     personalInfo: {
         firstName: {type: String, required: true},
