@@ -9,7 +9,7 @@ import { SyncLoader } from "react-spinners";
 import Accordion from './Accordion'
 import RichTextEditor from "./RichTextEditor"
 
-import { THEMES, DEFAULT_LAYOUT } from "../constants/themes"
+import { THEMES } from "../constants/themes"
 
 
 export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors, isCheckingSpelling, handleSpellCheck}){
@@ -185,79 +185,11 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
     }
 
 
-    // --------------------------------------------------------- FCTS DE DRAG & DROP
 
-    // Dèbut du DRAG d'un objet
-    const handleDragStart = (e, type, colIndex, itemIndex) => {
-        // Type & Numéro de colonne de l'objet que l'on DRAG
-        e.dataTransfer.setData("type", type);
-        e.dataTransfer.setData("colIndex", colIndex);
-
-        // Position de l'objet
-        if (itemIndex !== undefined){
-            e.dataTransfer.setData("itemIndex", itemIndex);
-        }
-    };
-
-    // On DROP un objet sur un colonne
-    const handleDropOnColumn = (e, targetColIndex) => {
-        e.preventDefault();
-        const type = e.dataTransfer.getData("type");
-        const sourceColIndex = parseInt(e.dataTransfer.getData("colIndex"));
-
-        // Copie du layout acutel
-        const currentLayout = cvData.layout || DEFAULT_LAYOUT;
-        const newLayout = JSON.parse(JSON.stringify(currentLayout));
-
-        // Inverse les positons si c'est une COLONNE
-        if (type === "column"){
-
-            if(sourceColIndex === targetColIndex){
-                return;
-            }
-
-            [newLayout[sourceColIndex], newLayout[targetColIndex]] = [newLayout[targetColIndex], newLayout[sourceColIndex]];
-        }
-
-        // Change l'item de colonne si c'est un ITEM
-        else if (type === "item"){
-            const sourceItemIndex = parseInt(e.dataTransfer.getData("itemIndex"));
-            const [draggedItem] = newLayout[sourceColIndex].items.splice(sourceItemIndex, 1);
-            newLayout[targetColIndex].items.push(draggedItem);
-        }
-
-        // Sauvegarde le nouveau layout
-        setCvData({ ...cvData, layout: newLayout });
-    };
-
-    // On DROP un objet sur un autre objet
-    const handleDropOnItem = (e, targetColIndex, targetItemIndex) => {
-        e.preventDefault();
-        e.stopPropagation(); // Empêche de déclencher 'handleDropOnColumn'
-        const type = e.dataTransfer.getData("type");
-
-        if (type === "item"){
-            const sourceColIndex = parseInt(e.dataTransfer.getData("colIndex"));
-            const sourceItemIndex = parseInt(e.dataTransfer.getData("itemIndex"));
-
-            // Copie du layout acutel
-            const currentLayout = cvData.layout || DEFAULT_LAYOUT;
-            const newLayout = JSON.parse(JSON.stringify(currentLayout));
-
-            // Insère l'élément à l'index où on l'a DROP
-            const [draggedItem] = newLayout[sourceColIndex].items.splice(sourceItemIndex, 1);
-            newLayout[targetColIndex].items.splice(targetItemIndex, 0, draggedItem);
-
-            // Sauvegarde le nouveau layout
-            setCvData({ ...cvData, layout: newLayout });
-        }
-
-
-    };
 
 
     return (
-        <aside className={`flex flex-col left-0 relative z-10 h-full ${openAccordionsCount > 0 ? "w-110" : "w-46"} bg-[#311603] pt-10 overflow-y-auto scrollbar-none shrink-0 transition-all duration-300`}>
+        <aside className={`flex flex-col left-0 relative z-10 h-full ${openAccordionsCount > 0 ? "w-180" : "w-46"} bg-[#311603] pt-10 overflow-y-auto scrollbar-none shrink-0 transition-all duration-300`}>
 
             <Accordion 
             title="Informations" 

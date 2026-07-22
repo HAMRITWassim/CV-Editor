@@ -47,7 +47,7 @@ export default function RichTextEditor({ value, onChange }) {
   return (
     <div className="flex flex-col rounded-md overflow-hidden bg-[#ffcd86] text-[#311603] focus-within:ring-2 focus-within:ring-[#fccc69] transition-all">
       
-      <div className="flex gap-1 p-1 bg-[#fccc69] border-b border-[#61310e]/20">
+      <div className="flex gap-1 p-1 bg-[#fccc69] border-b border-[#61310e]/20 ">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={`px-3 py-1 rounded text-sm font-bold cursor-pointer ${editor.isActive('bold') ? 'bg-[#61310e] text-[#fccc69]' : 'hover:bg-[#e6b85c]'}`}
@@ -70,7 +70,7 @@ export default function RichTextEditor({ value, onChange }) {
         </button>
       </div>
 
-      <EditorContent className="cursor-text bg-white" editor={editor} />
+      <EditorContent className="cursor-text bg-white min-h-64" editor={editor} />
       
     </div>
   )
