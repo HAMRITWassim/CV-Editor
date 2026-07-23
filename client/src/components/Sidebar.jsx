@@ -284,7 +284,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                                     Expérience n°{index + 1}
                                 </h3>
 
-                                <div className='flex  items-center gap-4 text-xl'>
+                                <div className='flex items-center gap-4 text-xl'>
                                     
                                     <button
                                     className={`border rounded-full p-0.5  bg-transparent ${index === 0 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"}  transition-colors duration-100`}
@@ -307,80 +307,81 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
                             </div>
                                 
-
-                            <div>
-                                <h2>Intitulé du poste</h2>
-                                <input 
-                                type="text" 
-                                placeholder="ex: Data Analyst" 
-                                className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
-                                value={experience.position}
-                                onChange={(e) => {
-                                    const newExperiences = [...cvData.experiences];
-                                    newExperiences[index].position = e.target.value;
-                                    setCvData({ ...cvData, experiences: newExperiences });
-                                }}
-                                />
-                            </div>
-
-
-                            <div>
-                                <h2>Nom de l'entreprise</h2>
-                                <input 
-                                type="text" 
-                                placeholder="ex: Bouygues" 
-                                className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
-                                value={experience.company}
-                                onChange={(e) => {
-                                    const newExperiences = [...cvData.experiences];
-                                    newExperiences[index].company = e.target.value;
-                                    setCvData({ ...cvData, experiences: newExperiences });
-                                }} 
-                                />
-                            </div>
-
-
-                            <div>
-                                <h2>Date de début</h2>
-                                <input 
-                                type="month" 
-                                className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
-                                value={experience.startDate}
-                                onChange={(e) => {
-                                    const newExperiences = [...cvData.experiences];
-                                    newExperiences[index].startDate = e.target.value;
-                                    setCvData({ ...cvData, experiences: newExperiences });
-                                }}  
-                                />
-                            </div>
-
-                            <div>
-                                <h2>Date de fin</h2>
-                                <input 
-                                type="month" 
-                                className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
-                                value={experience.endDate}
-                                onChange={(e) => {
-                                    const newExperiences = [...cvData.experiences];
-                                    newExperiences[index].endDate = e.target.value;
-                                    setCvData({ ...cvData, experiences: newExperiences });
-                                }}  
-                                />
-                            </div>
-
-                            <div>
-                                <h2>Description du poste</h2>
-                                <RichTextEditor 
-                                    value={experience.description}
-                                    onChange={(htmlContent) => {
+                            <span className='flex flex-col gap-3'>
+                                <div>
+                                    <h2>Intitulé du poste</h2>
+                                    <input 
+                                    type="text" 
+                                    placeholder="ex: Data Analyst" 
+                                    className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
+                                    value={experience.position}
+                                    onChange={(e) => {
                                         const newExperiences = [...cvData.experiences];
-                                        newExperiences[index].description = htmlContent;
+                                        newExperiences[index].position = e.target.value;
                                         setCvData({ ...cvData, experiences: newExperiences });
                                     }}
-                                />
-                            </div>
+                                    />
+                                </div>
 
-                            <div>
+
+                                <div>
+                                    <h2>Nom de l'entreprise</h2>
+                                    <input 
+                                    type="text" 
+                                    placeholder="ex: Bouygues" 
+                                    className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
+                                    value={experience.company}
+                                    onChange={(e) => {
+                                        const newExperiences = [...cvData.experiences];
+                                        newExperiences[index].company = e.target.value;
+                                        setCvData({ ...cvData, experiences: newExperiences });
+                                    }} 
+                                    />
+                                </div>
+
+
+                                <div>
+                                    <h2>Date de début</h2>
+                                    <input 
+                                    type="month" 
+                                    className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
+                                    value={experience.startDate}
+                                    onChange={(e) => {
+                                        const newExperiences = [...cvData.experiences];
+                                        newExperiences[index].startDate = e.target.value;
+                                        setCvData({ ...cvData, experiences: newExperiences });
+                                    }}  
+                                    />
+                                </div>
+
+                                <div>
+                                    <h2>Date de fin</h2>
+                                    <input 
+                                    type="month" 
+                                    className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
+                                    value={experience.endDate}
+                                    onChange={(e) => {
+                                        const newExperiences = [...cvData.experiences];
+                                        newExperiences[index].endDate = e.target.value;
+                                        setCvData({ ...cvData, experiences: newExperiences });
+                                    }}  
+                                    />
+                                </div>
+
+                                <div>
+                                    <h2>Description du poste</h2>
+                                    <RichTextEditor 
+                                        value={experience.description}
+                                        onChange={(htmlContent) => {
+                                            const newExperiences = [...cvData.experiences];
+                                            newExperiences[index].description = htmlContent;
+                                            setCvData({ ...cvData, experiences: newExperiences });
+                                        }}
+                                    />
+                                </div>
+                            </span>
+
+                            <div className='flex flex-col w-[40%]'>
                                 
                                 <button
                                 className={`flex-1 px-4 py-2 mt-3 rounded-full font-bold text-[#311603] transition-all duration-150 text-sm ${
@@ -405,6 +406,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                                         experiences: newExperiences
                                     });
                                 }}	
+                            
                                 >
                                     Supprimer l'expérience
                                 </button>
@@ -490,65 +492,68 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
 
                             </div>
-                            <div>
-                                <h2>Intitulé du diplôme</h2>
-                                <input 
-                                type="text" 
-                                placeholder="ex: Master en Ingénierie Informatique" 
-                                className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
-                                value={formation.degree}
-                                onChange={(e) => {
-                                    const newFormation = [...cvData.education];
-                                    newFormation[index].degree = e.target.value;
-                                    setCvData({ ...cvData, education: newFormation });
-                                }}
-                                />
-                            </div>
+
+                            <span className='flex flex-col gap-3'>
+                                <div>
+                                    <h2>Intitulé du diplôme</h2>
+                                    <input 
+                                    type="text" 
+                                    placeholder="ex: Master en Ingénierie Informatique" 
+                                    className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
+                                    value={formation.degree}
+                                    onChange={(e) => {
+                                        const newFormation = [...cvData.education];
+                                        newFormation[index].degree = e.target.value;
+                                        setCvData({ ...cvData, education: newFormation });
+                                    }}
+                                    />
+                                </div>
 
 
-                            <div>
-                                <h2>Établissement</h2>
-                                <input 
-                                type="text" 
-                                placeholder="ex: Sorbonne Université" 
-                                className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
-                                value={formation.school}
-                                onChange={(e) => {
-                                    const newFormation = [...cvData.education];
-                                    newFormation[index].school = e.target.value;
-                                    setCvData({ ...cvData, education: newFormation });
-                                }}
-                                />
+                                <div>
+                                    <h2>Établissement</h2>
+                                    <input 
+                                    type="text" 
+                                    placeholder="ex: Sorbonne Université" 
+                                    className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
+                                    value={formation.school}
+                                    onChange={(e) => {
+                                        const newFormation = [...cvData.education];
+                                        newFormation[index].school = e.target.value;
+                                        setCvData({ ...cvData, education: newFormation });
+                                    }}
+                                    />
 
-                            </div>
+                                </div>
 
-                            <div>
-                                <h2>Date de début</h2>
-                                <input 
-                                type="month" 
-                                className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
-                                value={formation.startDate}
-                                onChange={(e) => {
-                                    const newFormation = [...cvData.education];
-                                    newFormation[index].startDate = e.target.value;
-                                    setCvData({ ...cvData, education: newFormation });
-                                }}
-                                />
-                            </div>
+                                <div>
+                                    <h2>Date de début</h2>
+                                    <input 
+                                    type="month" 
+                                    className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
+                                    value={formation.startDate}
+                                    onChange={(e) => {
+                                        const newFormation = [...cvData.education];
+                                        newFormation[index].startDate = e.target.value;
+                                        setCvData({ ...cvData, education: newFormation });
+                                    }}
+                                    />
+                                </div>
 
-                            <div>
-                                <h2>Date de fin</h2>
-                                <input 
-                                type="month" 
-                                className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
-                                value={formation.endDate}
-                                onChange={(e) => {
-                                    const newFormation = [...cvData.education];
-                                    newFormation[index].endDate = e.target.value;
-                                    setCvData({ ...cvData, education: newFormation });
-                                }}
-                                />
-                            </div>
+                                <div>
+                                    <h2>Date de fin</h2>
+                                    <input 
+                                    type="month" 
+                                    className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full"
+                                    value={formation.endDate}
+                                    onChange={(e) => {
+                                        const newFormation = [...cvData.education];
+                                        newFormation[index].endDate = e.target.value;
+                                        setCvData({ ...cvData, education: newFormation });
+                                    }}
+                                    />
+                                </div>
+                            </span>
 
                             <div>
                                 <button 
@@ -742,41 +747,42 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
                             </div>
 
+                            <span className='flex flex-col gap-3'>
+                                <div>
+                                    <h2>Nom</h2>
+                                    <input 
+                                    type="text" 
+                                    placeholder="ex: Anglais" 
+                                    className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
+                                    value={language.name}
+                                    onChange={(e) => {
+                                        const newLanguage = [...cvData.languages];
+                                        newLanguage[index].name = e.target.value;
+                                        setCvData({ ...cvData, languages: newLanguage });
+                                    }}
+                                    />
+                                </div>
 
-                            <div>
-                                <h2>Nom</h2>
-                                <input 
-                                type="text" 
-                                placeholder="ex: Anglais" 
-                                className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
-                                value={language.name}
-                                onChange={(e) => {
-                                    const newLanguage = [...cvData.languages];
-                                    newLanguage[index].name = e.target.value;
-                                    setCvData({ ...cvData, languages: newLanguage });
-                                }}
-                                />
-                            </div>
+                                <div>
+                                    <h2>Niveau</h2>
+                                    <select 
+                                    className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
+                                    value={language.level}
+                                    onChange={(e) => {
+                                        const newLanguage = [...cvData.languages];
+                                        newLanguage[index].level = e.target.value;
+                                        setCvData({ ...cvData, languages: newLanguage });
+                                    }}
+                                    >
+                                        <option value="" disabled>Sélectionner un niveau</option>
+                                        <option value="nativeLanguage">Langue maternelle</option>
+                                        <option value="bilingual">Bilingue/Courant (C1/C2)</option>
+                                        <option value="intermediate">Intermédiaire(B1/B2)</option>
+                                        <option value="beginner">Débutant(A1/A2)</option>
 
-                            <div>
-                                <h2>Niveau</h2>
-                                <select 
-                                className="p-1 rounded-md bg-[#ffcd86] text-[#311603] outline-none w-full" 
-                                value={language.level}
-                                onChange={(e) => {
-                                    const newLanguage = [...cvData.languages];
-                                    newLanguage[index].level = e.target.value;
-                                    setCvData({ ...cvData, languages: newLanguage });
-                                }}
-                                >
-                                    <option value="" disabled>Sélectionner un niveau</option>
-                                    <option value="nativeLanguage">Langue maternelle</option>
-                                    <option value="bilingual">Bilingue/Courant (C1/C2)</option>
-                                    <option value="intermediate">Intermédiaire(B1/B2)</option>
-                                    <option value="beginner">Débutant(A1/A2)</option>
-
-                                </select>
-                            </div>
+                                    </select>
+                                </div>
+                            </span>
 
                             <div>
                                 <button 
