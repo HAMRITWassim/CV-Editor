@@ -11,8 +11,8 @@ import { MoonLoader } from "react-spinners";
 
 function App() {
 
-	// STATES
-	const [cvData, setCvData] = useState({
+	// CV de départ
+	const initialCV = {
 		title: "",
 		lang: "FR",
 		theme: "marron",
@@ -32,7 +32,97 @@ function App() {
 		education: [],
 		skills: [],
 		languages: []
-	});
+	};
+
+	// Historique de n versions du CV (on définit n=20 plus bas)
+	const [history, setHistory] = useState([initialCV]);
+
+	// Position du cv actuel dans l'historique (0 = début)
+	const [currentIndex, setCurrentIndex] = useState(0);
+
+	// CV actuel (Cv de l'historique pointé par son index)
+	const cvData = history[currentIndex];
+
+	const setCvData = (newCvData) => {
+		// Efface les "futurs" CVs si on revient en arrière et modifie le CV
+		const newHistory = history.slice(0, currentIndex + 1);
+		
+		// Copie du Cv
+		const clonedData = JSON.parse(JSON.stringify(newCvData));
+		newHistory.push(clonedData);
+
+		// Limite l'historique à 20 CVs
+		if (newHistory.length > 20) {
+		newHistory.shift(); 			// Supprime le plus vieux CV
+		} 
+
+		else {
+		setHistory(newHistory);
+		setCurrentIndex(currentIndex + 1); 
+		}
+	};
+
+	// Charge un CV sans créer d'historique (permet de ne pas avoir le bouton UNDO cliquable lors du chargement de la page)
+	const initCvData = (loadedCvData) => {
+		// Écrase l'historique pour qu'il ne contienne que loadedCvData
+		const clonedData = JSON.parse(JSON.stringify(loadedCvData))
+		setHistory([clonedData]);
+		setCurrentIndex(0);
+	}
+
+	// FCT Annuler
+	const handleUndo = () => {
+		if (currentIndex > 0)
+		{
+			setCurrentIndex((prev) => prev - 1);
+		}
+	}
+
+	// FCT Rétablir
+	const handleRedo = () => {
+		if (currentIndex < history.length - 1)
+		{
+			setCurrentIndex((prev) => prev + 1);
+		}
+	};
+
+	// Utilisation des raccourcis pour Annuler/Rétablir un changement
+	useEffect(() => {
+		const handleKeyDown = (e) => {
+			// Vérifie si on appuie sur CTRL(Windows) ou CMD(Mac)
+			const isCTRLorCMD = e.ctrlKey || e.metaKey;
+
+			if (isCTRLorCMD && e.key.toLowerCase() === "z") {
+				//empêche le comportement par défaut du navigateur
+				e.preventDefault();
+
+				// CTRL + SHIFT + Z --> Rétablir
+				if (e.shiftKey){
+					handleRedo(); 
+				}
+
+				// CTRL + Z --> Annuler
+				else{
+					handleUndo();
+				}
+			}
+
+			// CTRL + Y --> Rétablir
+			else if (isCTRLorCMD && e.key.toLowerCase() === "y") {
+				e.preventDefault();
+				handleRedo(); 		
+			}
+		};
+
+		// Attache l'écouteur à la fenêtre
+		window.addEventListener("keydown", handleKeyDown);
+
+		return () => window.removeEventListener("keydown", handleKeyDown);	// Retire l'ecouteur 
+
+	}, [currentIndex, history]);
+
+
+
 
 	const [isCheckingSpelling, setIsCheckingSpelling] = useState(false);
     const [spellErrors, setSpellErrors] = useState([]);
@@ -48,7 +138,7 @@ function App() {
 
 				if(response.ok){
 					const data = await response.json();
-					setCvData(data); // On utilise les données MongoDB pour remplir la page
+					initCvData(data); // On utilise les données MongoDB pour remplir la page
 				}
 			}
 			
@@ -178,7 +268,14 @@ function App() {
 			<div className='bg-[#EFE9E3] h-screen flex flex-col overflow-hidden'>
 
 				{/* HEADER */}
-				<Header cvData={cvData} setCvData={setCvData}/>
+				<Header
+				cvData={cvData}
+				setCvData={setCvData}
+				onUndo={handleUndo}
+				onRedo={handleRedo} 
+				canUndo={currentIndex > 0} 
+				canRedo={currentIndex < history.length - 1}
+				/>
 
 				<div className="flex flex-1 overflow-hidden">
 

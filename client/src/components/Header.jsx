@@ -1,7 +1,10 @@
 import cvLogo from '../assets/cv_icon.png'
 
+// ICONS
+import { FaUndo, FaRedo } from "react-icons/fa";
 
-export default function Header({cvData, setCvData}){
+
+export default function Header({cvData, setCvData, onUndo, onRedo, canUndo, canRedo}){
 
     // Gère la sauvegarde du CV
     const handleSaveCV = async () => {
@@ -92,7 +95,31 @@ export default function Header({cvData, setCvData}){
             
             </h1>
 
+            
+
             <div className=' flex-1 flex justify-end pr-6 gap-3'>
+
+            {/* BOUTONS UNDO et REDO */}
+            <div className="flex gap-4 mr-4">
+                <button 
+                    onClick={onUndo} 
+                    disabled={!canUndo}
+                    title="Annuler (Ctrl+Z)"
+                    className={`px-3 rounded-full transition-all duration-200 border-2 bg-transparent ${canUndo ? "hover:bg-[#61310e]/10 text-[#61310e] border-[#61310e]  cursor-pointer" : "text-gray-500 border-gray-500 opacity-50 cursor-not-allowed"}`}
+                >
+                    <FaUndo />
+                </button>
+
+                <button 
+                    onClick={onRedo} 
+                    disabled={!canRedo}
+                    title="Rétablir (Ctrl+Y)"
+                    className={`px-3 rounded-full transition-all duration-200 border-2 bg-transparent ${canRedo ? "hover:bg-[#61310e]/10 text-[#61310e] border-[#61310e] cursor-pointer " : "text-gray-500 border-gray-500 opacity-50 cursor-not-allowed"}`}
+                >
+                    <FaRedo />
+                </button>
+            </div>
+
 
                 {/* BOUTON SAUVEGARDER */}
                 <button
