@@ -11,6 +11,7 @@ import Accordion from './Accordion'
 import RichTextEditor from "./RichTextEditor"
 
 import { THEMES } from "../constants/themes"
+import toast from "react-hot-toast"
 
 
 export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors, isCheckingSpelling, handleSpellCheck}){
@@ -45,39 +46,55 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
         // Retire les balises HTML
         const rawText = currentText?.replace(/<[^>]*>/g, '').trim();
         if(!rawText){
-            alert("Veuillez d'abord remplir le champs de description avant de reformuler !");
+            toast.error("Veuillez d'abord remplir le champs de description avant de reformuler !");
             return;
         }
 
         try {
             setLoadingIndex(index);
 
-            // Appel à l'API BACK
-            const response = await fetch("http://localhost:5000/api/ai/reformuler",{
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({text: currentText})
-            })
+            // Promesse que l'on passera ensuite au Toast
+            const rephraseRequest = async () => {
+                // Appel à l'API BACK
+                const response = await fetch("http://localhost:5000/api/ai/reformuler",{
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({text: currentText})
+                })
 
-            if(!response.ok) throw new Error("Erreur lors de la communication avec le serveur.");
+                if(!response.ok) throw new Error("Erreur lors de la communication avec le serveur.");
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if(data.result){
-                const newExperiences = [...cvData.experiences];
+                if(data.result){
+                    const newExperiences = [...cvData.experiences];
 
-                // Remplace le texte par le reformulé (à l'index correspondant)
-                newExperiences[index].description = data.result;
+                    // Remplace le texte par le reformulé (à l'index correspondant)
+                    newExperiences[index].description = data.result;
 
-                setCvData({
-                    ...cvData,
-                    experiences: newExperiences
-                });
-            }
+                    setCvData({
+                        ...cvData,
+                        experiences: newExperiences
+                    });
+                }
+                else{
+                    throw new Error("L'IA n'a rien renvoyé.")
+                }
+            };
+            
+            // On passe la promesse au toast
+            await toast.promise(
+                rephraseRequest(),  // action à surveiller
+                {
+                    loading: "L'IA reformule votre texte...",
+                    success: "Texte reformulé !",
+                    error: "Impossible de reformuler le texte."
+                }
+            );
+                
         }
         catch (error) {
             console.error("Erreur de reformulation :", error);
-            alert("Impossible de reformuler le text. Veuillez vérifier l'état du serveur.")   
         }
         finally{
             // Reset l'indice
@@ -148,12 +165,13 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
             setCvData(newCV);
 
             console.log("Traduction du CV terminée avec succès !");
+            toast.success("Traduction du CV terminée avec succès !");
 
 
         }
         catch (error){
             console.error("Erreur lors de la traduction du CV : ", error);
-            alert("Erreur lors de la traduction du CV.");
+            toast.error("Erreur lors de la traduction du CV.");
         }
         finally{
             setLoadingTrad(false);
@@ -406,6 +424,8 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                                         ...cvData,
                                         experiences: newExperiences
                                     });
+
+                                    toast.success(`Expérience n°${index+1} supprimée.`)
                                 }}	
                             
                                 >
@@ -567,9 +587,12 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                                         ...cvData,
                                         education: newFormation
                                     });
+
+                                    toast.success(`Formation n°${index+1} supprimée.`)
+
                                 }}	
                                 >
-                                    Supprimer
+                                    Supprimer la formation
                                 </button>
 
                             </div>
@@ -671,6 +694,9 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                                         ...cvData,
                                         skills: newSkill
                                     });
+
+                                    toast.success(`Compétence n°${index+1} supprimée.`)
+
                                 }}	
                                 >
                                     Supprimer
@@ -796,6 +822,9 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                                         ...cvData,
                                         languages: newLanguage
                                     });
+
+                                    toast.success(`Langue n°${index+1} supprimée.`)
+
                                 }}	
                                 >
                                     Supprimer
@@ -848,6 +877,33 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                 
 
                 <div className='flex flex-col gap-4 w-full justify-center relative'>
+
+                     {/* BOUTON TRADUCTION FR <-> EN */}
+                    <div className="flex flex-col gap-4 items-center">
+                        <button className={`bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer flex justify-center items-center transition-all duration-150 w-[50%] ${
+                                loadingTrad === true 
+                                ? 'bg-gray-700 text-gray-300 cursor-not-allowed' 
+                                : 'bg-[#61310e] hover:bg-[#3e1c04] hover:cursor-pointer'
+                            }`}
+                        
+                        onClick={handleTranslateFullCV}
+                        disabled={loadingTrad === true}
+                        >
+                            
+                            {loadingTrad === true 
+                            ? <SyncLoader color='#6a7282' size={5} speedMultiplier={0.7} /> 
+                            : <div className='flex justify-center items-center'><IoLanguageSharp className='mr-1' /> <p className='mr-1'>Traduire</p>
+                            
+                            {cvData.lang === "FR"
+                            ? " en Anglais"
+                            : " en Français"
+                            }</div>}
+                            
+                        </button>
+                    </div>
+
+
+
                     {/* BOUTON DE VÉRIFICATION ORTHOGRAPHIQUE */}
                     <div className="flex flex-col gap-4 items-center">
                         
@@ -918,29 +974,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                         )}
                     </div>
                         
-                    {/* BOUTON TRADUCTION FR <-> EN */}
-                    <div className="flex flex-col gap-4 items-center">
-                        <button className={`bg-[#61310e] px-4 py-2 rounded-full font-bold text-[#fccc69] hover:cursor-pointer flex justify-center items-center transition-all duration-150 w-[50%] ${
-                                loadingTrad === true 
-                                ? 'bg-gray-700 text-gray-300 cursor-not-allowed' 
-                                : 'bg-[#61310e] hover:bg-[#3e1c04] hover:cursor-pointer'
-                            }`}
-                        
-                        onClick={handleTranslateFullCV}
-                        disabled={loadingTrad === true}
-                        >
-                            
-                            {loadingTrad === true 
-                            ? <SyncLoader color='#6a7282' size={5} speedMultiplier={0.7} /> 
-                            : <div className='flex justify-center items-center'><IoLanguageSharp className='mr-1' /> <p className='mr-1'>Traduire</p>
-                            
-                            {cvData.lang === "FR"
-                            ? " en Anglais"
-                            : " en Français"
-                            }</div>}
-                            
-                        </button>
-                    </div>
+                   
 
                 </div>
                     

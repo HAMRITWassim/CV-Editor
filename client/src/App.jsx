@@ -8,6 +8,7 @@ import CVPreview from './components/CVPreview';
 // ICONES
 import { MoonLoader } from "react-spinners";
 
+import toast, { Toaster } from "react-hot-toast";
 
 function App() {
 
@@ -75,6 +76,7 @@ function App() {
 		if (currentIndex > 0)
 		{
 			setCurrentIndex((prev) => prev - 1);
+			toast("Action annulée", {icon: "↩️"});
 		}
 	}
 
@@ -83,6 +85,8 @@ function App() {
 		if (currentIndex < history.length - 1)
 		{
 			setCurrentIndex((prev) => prev + 1);
+			toast("Action rétablie", {icon: "↪️"});
+
 		}
 	};
 
@@ -144,6 +148,7 @@ function App() {
 			
 			catch (error) {
 				console.error("Erreur de connexion au serveur: ", error);
+				toast.error("Erreur de connexion au serveur.");
 			}
 
 			finally{
@@ -204,7 +209,7 @@ function App() {
 
 		// S'arrête si rien n'est écrit sur le CV
 		if (elementsToCheck.length === 0) {
-			alert("Il n'y a pas de texte à analyser !");
+			toast.error("Il n'y a pas de texte à analyser !");
 			setIsCheckingSpelling(false);
 			return;
 		}
@@ -225,6 +230,7 @@ function App() {
 				
 				// Si on trouve des erreurs pour ce texte précis
 				if (data.errors && data.errors.length > 0) {
+					
 					// Ajout de l'étiquette "sectionName" pour chaque erreur
 					const errorsWithLabel = data.errors.map(err => ({
 						...err,
@@ -237,14 +243,15 @@ function App() {
 
 			// Résultat
 			if (allErrors.length === 0) {
-				alert("✅ Aucune faute trouvée.");
+				toast.success("Aucune faute trouvée.");
 			} else {
 				setSpellErrors(allErrors); // On affiche les erreurs dans la Sidebar
+				toast.error(`${allErrors.length} erreur(s) détectée(s) !`)
 			}
 
 		} catch (error) {
 			console.error("Erreur lors de la vérification :", error);
-			alert("Une erreur est survenue lors de la vérification orthographique.");
+			toast.error("Une erreur est survenue lors de la vérification orthographique.");
 		} finally {
 			setIsCheckingSpelling(false);
 		}
@@ -266,6 +273,10 @@ function App() {
   	return (
 		<>
 			<div className='bg-[#EFE9E3] h-screen flex flex-col overflow-hidden'>
+
+				<Toaster 
+				position="bottom-right"
+				/>
 
 				{/* HEADER */}
 				<Header

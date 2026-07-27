@@ -3,32 +3,46 @@ import cvLogo from '../assets/cv_icon.png'
 // ICONS
 import { FaUndo, FaRedo } from "react-icons/fa";
 
+import toast from "react-hot-toast"
+
 
 export default function Header({cvData, setCvData, onUndo, onRedo, canUndo, canRedo}){
 
     // Gère la sauvegarde du CV
     const handleSaveCV = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/cv/save", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(cvData)
-            });
-
-            const data = await response.json();
-
-            if(response.ok){
-                alert("✅ CV sauvegardé avec succès !");
-            }
             
-            else{   // Il manque les champs "required" du modèles Mongoose
-                alert(`❌ Erreur: ${data.error}`);
-            }
+            const saveRequest = async () => {   
+                 const response = await fetch("http://localhost:5000/api/cv/save", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(cvData)
+                });
+
+                const data = await response.json();
+
+                if(!response.ok){
+                    throw new Error(data.error || "Erreur lors de la sauvegarde");
+                }
+
+                return data;
+
+            };
+
+            await toast.promise(
+                saveRequest(),
+                {
+                    loading: "Sauvegarde du CV en cours...",
+                    success: "CV sauvegardé avec succès !",
+                    error: (err) => `Erreur: ${err.message}`   //err --> erreur jetée plus haut avec "throw new Error"
+                }
+            );
+            
         }
-        
+
+
         catch (error) {
             console.error("Erreur réseau: ", error);
-            alert("Impossible de joindre le serveur.");
         }
     };
 
@@ -38,41 +52,54 @@ export default function Header({cvData, setCvData, onUndo, onRedo, canUndo, canR
             const cvElement = document.getElementById('cv-to-print');
             
             if(!cvElement){
-                alert("Erreur: Impossible de trouver le CV ! (aucun ID 'cv-to-print')")
+                toast.error("Erreur: Impossible de trouver le CV ! (aucun ID 'cv-to-print')")
                 return;
             }
 
             // Extrait le contenu HTML à l'intérieur de 'cv-to-print'
             const htmlToPrint = cvElement.innerHTML;
 
-            // Envoi au BACKEND
-            const response = await fetch("http://localhost:5000/api/pdf/generate", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    html: htmlToPrint,
-                    title: cvData.title
-                }),
-            });
+            // Promesse
+            const exportRequest = async () => {
+                // Envoi au BACKEND
+                const response = await fetch("http://localhost:5000/api/pdf/generate", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        html: htmlToPrint,
+                        title: cvData.title
+                    }),
+                });
 
-            if (!response.ok) throw new Error("Erreur réseau");
+                if (!response.ok) throw new Error("Erreur réseau");
 
-            // Transforme la réponse en fichier (Blob)
-            const blob = await response.blob();
+                // Transforme la réponse en fichier (Blob)
+                const blob = await response.blob();
 
-            
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", `${cvData.title || 'Mon_CV'}.pdf`);
-            document.body.appendChild(link);
-            link.click();   //déclenche le téléchargement
+                
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", `${cvData.title || 'Mon_CV'}.pdf`);
+                document.body.appendChild(link);
+                link.click();   //déclenche le téléchargement
+                link.parentNode.removeChild(link);
 
-            link.parentNode.removeChild(link);
+            }
+
+
+
+            await toast.promise(
+                exportRequest(),
+                {
+                    loading: "Export du CV au format PDF...",
+                    success: "CV exporté avec succès !",
+                    error: "Impossible d'exporter le CV au format PDF."
+                }
+            )
         } 
         catch (error) {
             console.error("Erreur lors de l'export:", error);
-            alert("Impossible de générer le PDF.");
         }
     }
 
