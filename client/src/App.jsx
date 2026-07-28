@@ -35,60 +35,83 @@ function App() {
 		languages: []
 	};
 
-	// Historique de n versions du CV (on définit n=20 plus bas)
-	const [history, setHistory] = useState([initialCV]);
-
-	// Position du cv actuel dans l'historique (0 = début)
-	const [currentIndex, setCurrentIndex] = useState(0);
-
-	// CV actuel (Cv de l'historique pointé par son index)
-	const cvData = history[currentIndex];
-
-	const setCvData = (newCvData) => {
-		// Efface les "futurs" CVs si on revient en arrière et modifie le CV
-		const newHistory = history.slice(0, currentIndex + 1);
+	// "Capsule" Temporelle
+	const [historyState, setHistoryState] = useState({
+		history: [initialCV], 		// Historique de n versions du CV (on définit n=20 plus bas)
+		currentIndex: 0				// Position du cv actuel dans l'historique (0 = début)
+	});
 		
-		// Copie du Cv
-		const clonedData = JSON.parse(JSON.stringify(newCvData));
-		newHistory.push(clonedData);
+	
+	// CV actuel (Cv de l'historique pointé par son index)
+	const cvData = historyState.history[historyState.currentIndex];
 
-		// Limite l'historique à 20 CVs
-		if (newHistory.length > 20) {
-		newHistory.shift(); 			// Supprime le plus vieux CV
-		} 
 
-		else {
-		setHistory(newHistory);
-		setCurrentIndex(currentIndex + 1); 
-		}
+	const setCvData = (action) => {
+
+		// On utilise "prev" pour tjrs prendre la version la plus récente
+		setHistoryState((prev) => {
+			const { history, currentIndex } = prev;
+
+			const currentCv = history[currentIndex];
+			const resolvedCvData = typeof action === "function" ? action(currentCv) : action;	// S'adapte si l'on passe une fct
+
+			// Supprime les futurs "alternatifs" (après modification, plus besoin d'y accéder)
+			const newHistory = history.slice(0, currentIndex + 1);
+
+			// Copie du CV
+			const clonedData = JSON.parse(JSON.stringify(resolvedCvData));
+			newHistory.push(clonedData);
+
+			// Limite de 20 CVs dans l'historique
+			if (newHistory.lenght > 20)
+			{
+				newHistory.shift();
+				return { history: newHistory, currentIndex: 19};
+			}
+
+			else
+			{
+				return { history: newHistory, currentIndex: currentIndex + 1 };
+			}
+		});
 	};
 
 	// Charge un CV sans créer d'historique (permet de ne pas avoir le bouton UNDO cliquable lors du chargement de la page)
 	const initCvData = (loadedCvData) => {
 		// Écrase l'historique pour qu'il ne contienne que loadedCvData
 		const clonedData = JSON.parse(JSON.stringify(loadedCvData))
-		setHistory([clonedData]);
-		setCurrentIndex(0);
-	}
+		setHistoryState({
+			history: [clonedData],
+			currentIndex: 0
+		});
+	};
 
 	// FCT Annuler
 	const handleUndo = () => {
-		if (currentIndex > 0)
+		if (historyState.currentIndex > 0)
 		{
-			setCurrentIndex((prev) => prev - 1);
 			toast("Action annulée", {icon: "↩️"});
+
+			setHistoryState((prev) => ({ 
+				...prev, 
+				currentIndex: prev.currentIndex - 1 
+			}));
 		}
-	}
+	};
 
 	// FCT Rétablir
 	const handleRedo = () => {
-		if (currentIndex < history.length - 1)
+		if (historyState.currentIndex < historyState.history.length - 1)
 		{
-			setCurrentIndex((prev) => prev + 1);
-			toast("Action rétablie", {icon: "↪️"});
+			toast('Action rétablie', { icon: '↪️' });
 
+			setHistoryState((prev) => ({ 
+				...prev, 
+				currentIndex: prev.currentIndex + 1
+			}));
 		}
 	};
+
 
 	// Utilisation des raccourcis pour Annuler/Rétablir un changement
 	useEffect(() => {
@@ -123,7 +146,7 @@ function App() {
 
 		return () => window.removeEventListener("keydown", handleKeyDown);	// Retire l'ecouteur 
 
-	}, [currentIndex, history]);
+	}, [historyState.currentIndex, historyState.history]);
 
 
 
@@ -284,8 +307,8 @@ function App() {
 				setCvData={setCvData}
 				onUndo={handleUndo}
 				onRedo={handleRedo} 
-				canUndo={currentIndex > 0} 
-				canRedo={currentIndex < history.length - 1}
+				canUndo={historyState.currentIndex > 0} 
+				canRedo={historyState.currentIndex < historyState.history.length - 1}
 				/>
 
 				<div className="flex flex-1 overflow-hidden">
