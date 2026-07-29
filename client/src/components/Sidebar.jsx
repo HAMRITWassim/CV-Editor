@@ -23,7 +23,22 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
 
     const [loadingTrad, setLoadingTrad] = useState(false);
 
+    const [customColors, setCustomColors] = useState([]);
 
+
+    // Fct déclenché quand on sélectionne une nouvelle couleur (Style)
+    const handleAddColor = (e) => {
+        const newColor = e.target.value;
+
+        // Ajout de la couleur au CV
+        setCvData({ ...cvData, theme: newColor});
+
+        // Ajout dans la liste des couleurs personnalisées (state)
+        if(!customColors.includes(newColor))
+        {
+            setCustomColors([...customColors, newColor]);
+        }
+    };
 
     
     const handleAccordionToggle = (isOpen) => {
@@ -988,7 +1003,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
             onClick={(isOpen) => handleAccordionToggle(isOpen)}
             isSidebarOpen={openAccordionsCount > 0}
             >
-                <div className="flex justify-evenly items-center py-2">
+                <div className="flex flex-wrap gap-8 items-center py-2">
 
                     {/* Transforme THEMES en tableau pour boucler dessus*/}
                     {Object.entries(THEMES).map(([themeKey, themeValues]) => (
@@ -996,7 +1011,7 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                             key={themeKey}
                             className={`
                                 w-10 h-10 rounded-full border-2 transition-all duration-200 
-                                cursor-pointer hover:shadow-lg shad
+                                cursor-pointer hover:shadow-lg 
                                 ${cvData.theme === themeKey ? "border-white scale-110 shadow-md  ring-white/30" : "border-black/50 opacity-80"}
                             `}
                             style={{ backgroundColor: themeValues.primary }}
@@ -1005,7 +1020,38 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
                         />
                     ))}
 
+                    {/* Couleurs personnalisées */}
+                    {customColors.map((color, index) => (
+                        <button
+                        key={index}
+                        className={`
+                            w-10 h-10 rounded-full border-2 transition-all duration-200 
+                            cursor-pointer hover:shadow-lg 
+                            ${cvData.theme === color ? "border-white scale-110 shadow-md  ring-white/30" : "border-black/50 opacity-80"}
+                        `}
+                        style={{ backgroundColor: color }}
+                        onClick={() => setCvData({...cvData, theme: color})}
+                    
+                        />
+                    ))}
+
+                    {/* Bouton d'ajout de couleurs */}
+                    <label className='flex justify-center items-center w-10 h-10 rounded-full border-dashed border-2 transition-all duration-200 cursor-pointer hover:shadow-lg text-gray-500 hover:text-gray-200'>
+                       
+                        <span className='font-bold text-2xl'>+</span>
+
+                        <input 
+                        type="color" 
+                        className='absolute h-0 w-0 opacity-0'
+                        onChange={handleAddColor}
+                        />
+
+                    </label>
+
+                    
+
                 </div>
+
 
             </Accordion>
 
