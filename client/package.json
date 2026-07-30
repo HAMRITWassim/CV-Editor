@@ -13,6 +13,7 @@
     "@fontsource/inter": "^5.2.8",
     "@tailwindcss/vite": "^4.3.2",
     "react": "^19.2.7",
+    "react-colorful": "^5.8.0",
     "react-dom": "^19.2.7",
     "react-hot-toast": "^2.6.0",
     "react-spinners": "^0.17.0"

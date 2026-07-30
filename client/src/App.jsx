@@ -17,6 +17,7 @@ function App() {
 		title: "",
 		lang: "FR",
 		theme: "marron",
+		font: "sans",
 		layout: [
             { id: "col-small", size: 1, items: ["skills", "languages"] },
             { id: "col-large", size: 2, items: ["experiences", "education"] }
@@ -44,6 +45,10 @@ function App() {
 	
 	// CV actuel (Cv de l'historique pointé par son index)
 	const cvData = historyState.history[historyState.currentIndex];
+
+	// Prévisualisation des couleurs
+    const [isPickerOpen, setIsPickerOpen] = useState(false);
+    const [tempColor, setTempColor] = useState("#000000");
 
 
 	const setCvData = (action) => {
@@ -314,12 +319,23 @@ function App() {
 				<div className="flex flex-1 overflow-hidden">
 
 					{/* SIDEBAR */}
-					<Sidebar cvData={cvData} setCvData={setCvData} spellErrors={spellErrors} setSpellErrors={setSpellErrors} isCheckingSpelling={isCheckingSpelling} handleSpellCheck={handleSpellCheck}/>
+					<Sidebar 
+					cvData={cvData}
+					setCvData={setCvData} 
+					spellErrors={spellErrors}
+					setSpellErrors={setSpellErrors} 
+					isCheckingSpelling={isCheckingSpelling} 
+					handleSpellCheck={handleSpellCheck}
+					isPickerOpen={isPickerOpen}
+					setIsPickerOpen={setIsPickerOpen}
+					tempColor={tempColor}
+					setTempColor={setTempColor}
+					/>
 
 					<main className="flex-1 bg-[#F5EFE6] flex justify-center items-center p-8 overflow-hidden">
 						
 						{/* FEUILLE DE PREVISUALISATION DU CV */}
-						<CVPreview cvData={cvData} setCvData={setCvData}/>
+						<CVPreview cvData={cvData} setCvData={setCvData} previewColor={isPickerOpen ? tempColor : null}/>
 
 					</main>
 

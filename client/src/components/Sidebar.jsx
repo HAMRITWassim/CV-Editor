@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
 // ICONES 
 import { IoLanguageSharp, IoArrowUp, IoArrowDown } from "react-icons/io5";
@@ -7,14 +7,30 @@ import { SyncLoader } from "react-spinners";
 
 
 // COMPONENTS
-import Accordion from './Accordion'
-import RichTextEditor from "./RichTextEditor"
+import Accordion from './Accordion';
+import RichTextEditor from "./RichTextEditor";
 
-import { THEMES } from "../constants/themes"
-import toast from "react-hot-toast"
+// CONSTANTS
+import { THEMES, FONTS } from "../constants/themes";
+
+// LIBRAIRIES EXT.
+import toast from "react-hot-toast";
+import { HexColorPicker } from "react-colorful";
 
 
-export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors, isCheckingSpelling, handleSpellCheck}){
+
+export default function Sidebar({
+    cvData, 
+    setCvData, 
+    spellErrors, 
+    setSpellErrors, 
+    isCheckingSpelling, 
+    handleSpellCheck, 
+    isPickerOpen,
+    setIsPickerOpen,
+    tempColor,
+    setTempColor
+}){
 
     //STATES
     const [openAccordionsCount, setOpenAccordionsCount] = useState(0);
@@ -26,21 +42,37 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
     const [customColors, setCustomColors] = useState([]);
 
 
-    // Fct déclenché quand on sélectionne une nouvelle couleur (Style)
-    const handleAddColor = (e) => {
-        const newColor = e.target.value;
 
-        // Ajout de la couleur au CV
-        setCvData({ ...cvData, theme: newColor});
 
-        // Ajout dans la liste des couleurs personnalisées (state)
-        if(!customColors.includes(newColor))
-        {
-            setCustomColors([...customColors, newColor]);
+    // Fct de validation de la couleur custom
+    const handleValidateColor = () => {
+        // envoie la couleur finale au CV
+        setCvData({...cvData, theme: tempColor});
+
+        // Ajout de la couleur à la palette dans la sidebar
+        if(!customColors.includes(tempColor)){
+            setCustomColors([...customColors, tempColor]);
+            
+        }
+
+        // Referme le color picker
+        setIsPickerOpen(false);
+
+    }
+
+
+    // Gère la prévisualisation en temps réel des couleurs custom sur le CV
+    const handleColorPreview = (e) => {
+        setCvData({...cvData, theme: e.target.value});
+    };
+
+    // Sauvegarde la couleur dans la sidebar lors du clic sur le bouton "Valider"
+    const handleSaveCustomColor = () => {
+        if(!customColors.includes(cvData.theme)){
+            setCustomColors([...customColors, cvData.theme]);
         }
     };
 
-    
     const handleAccordionToggle = (isOpen) => {
 
     if(isOpen) {
@@ -1003,54 +1035,138 @@ export default function Sidebar({cvData, setCvData, spellErrors, setSpellErrors,
             onClick={(isOpen) => handleAccordionToggle(isOpen)}
             isSidebarOpen={openAccordionsCount > 0}
             >
-                <div className="flex flex-wrap gap-8 items-center py-2">
+                {/* SECTION COULEURS */}
+                <div className="mb-6">
 
-                    {/* Transforme THEMES en tableau pour boucler dessus*/}
-                    {Object.entries(THEMES).map(([themeKey, themeValues]) => (
-                        <button 
-                            key={themeKey}
+                    <h3 className="font-bold mb-2">Couleur</h3>
+
+                    <div className="flex flex-wrap gap-8 items-center py-2">
+
+                        {/* Transforme THEMES en tableau pour boucler dessus*/}
+                        {Object.entries(THEMES).map(([themeKey, themeValues]) => (
+                            <button 
+                                key={themeKey}
+                                className={`
+                                    w-10 h-10 rounded-full border-2 transition-all duration-200 
+                                    cursor-pointer hover:shadow-lg 
+                                    ${cvData.theme === themeKey ? "border-white scale-110 shadow-md  ring-white/30" : "border-black/50 opacity-80"}
+                                `}
+                                style={{ backgroundColor: themeValues.primary }}
+                                onClick={() => setCvData({...cvData, theme: themeKey})}
+                                title={themeValues.name}
+                            />
+                        ))}
+
+                        {/* Couleurs personnalisées */}
+                        {customColors.map((color, index) => (
+                            <button
+                            key={index}
                             className={`
                                 w-10 h-10 rounded-full border-2 transition-all duration-200 
-                                cursor-pointer hover:shadow-lg 
-                                ${cvData.theme === themeKey ? "border-white scale-110 shadow-md  ring-white/30" : "border-black/50 opacity-80"}
+                                cursor-pointer hover:shadow-lg group relative 
+                                ${cvData.theme === color ? "border-white scale-110 shadow-md  ring-white/30" : "border-black/50 opacity-80"}
                             `}
-                            style={{ backgroundColor: themeValues.primary }}
-                            onClick={() => setCvData({...cvData, theme: themeKey})}
-                            title={themeValues.name}
-                        />
-                    ))}
+                            style={{ backgroundColor: color }}
+                            onClick={() => setCvData({...cvData, theme: color})}
+                        
+                            />
+                        ))}
 
-                    {/* Couleurs personnalisées */}
-                    {customColors.map((color, index) => (
-                        <button
-                        key={index}
-                        className={`
-                            w-10 h-10 rounded-full border-2 transition-all duration-200 
-                            cursor-pointer hover:shadow-lg 
-                            ${cvData.theme === color ? "border-white scale-110 shadow-md  ring-white/30" : "border-black/50 opacity-80"}
-                        `}
-                        style={{ backgroundColor: color }}
-                        onClick={() => setCvData({...cvData, theme: color})}
+                        {/* Bouton d'ajout de couleurs "+" */}
+                        <button 
+                        className='flex justify-center items-center w-10 h-10 rounded-full border-dashed border-2 transition-all duration-200 cursor-pointer hover:shadow-lg text-gray-500 hover:text-gray-200'
+                        onClick={() => {
+                            // Initialise avec la couleur actuelle
+                            setTempColor(cvData.theme?.startsWith("#") ? cvData.theme : "#171717");
+                            
+                            setIsPickerOpen(!isPickerOpen);
+                        }}
+                        
+                        >
                     
-                        />
-                    ))}
+                            <span className='font-bold text-2xl'>+</span>
 
-                    {/* Bouton d'ajout de couleurs */}
-                    <label className='flex justify-center items-center w-10 h-10 rounded-full border-dashed border-2 transition-all duration-200 cursor-pointer hover:shadow-lg text-gray-500 hover:text-gray-200'>
-                       
-                        <span className='font-bold text-2xl'>+</span>
 
-                        <input 
-                        type="color" 
-                        className='absolute h-0 w-0 opacity-0'
-                        onChange={handleAddColor}
-                        />
 
-                    </label>
+                        </button>
 
-                    
+                        {isPickerOpen && (
+                            <div className="absolute top-10 left-0 z-50 bg-white p-4 rounded-xl shadow-2xl border border-gray-200 flex flex-col gap-4 w-[220px]">
+
+                                {/* COLOR PICKER */}
+                                <HexColorPicker 
+                                    color={tempColor} 
+                                    onChange={setTempColor} 
+                                    style={{ width: "100%", height: "150px" }}
+                                />
+
+                                {/* Prévisualisation de la couleur */}
+                                <div className="flex items-center gap-2">
+                                    <div 
+                                        className="w-6 h-6 rounded border shadow-inner" 
+                                        style={{ backgroundColor: tempColor }}
+                                    ></div>
+                                    <span className="text-sm font-mono text-gray-600 uppercase">
+                                        {tempColor}
+                                    </span>
+                                </div>
+
+                                {/* Boutons "Annuler" & "Valider" */}
+                                <div className="flex justify-between items-center mt-1">
+
+                                    <button 
+                                        onClick={() => setIsPickerOpen(false)}
+                                        className="px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-gray-800 transition-colors"
+                                    >
+                                        Annuler
+                                    </button>
+
+
+                                    <button 
+                                        onClick={handleValidateColor}
+                                        className="px-4 py-1.5 bg-green-500 text-white text-xs font-bold rounded-lg shadow-md hover:bg-green-600 transition-all "
+                                    >
+                                        Valider
+                                    </button>
+
+
+                                </div>
+
+                            </div>
+                        )}
+
+                        
+                        
+                    </div>
+                </div>
+
+
+                {/* SECTION POLICES */}
+                <div className="mb-6">
+                    <h3 className="font-bold mb-2">Police d'écriture</h3>
+
+                    <div className="flex flex-wrap gap-8 items-center py-2">
+                        {Object.entries(FONTS).map(([fontKey, fontData]) => (
+
+                            <button
+                            key={fontKey}
+                            onClick={() => setCvData({...cvData, font:fontKey})}
+                            style={{fontFamily: fontData.value}} //affiche le bouton avec sa police associée
+                            className={`p-2 border-2 text-left rounded-md hover:bg-black/10 transition-colors cursor-pointer
+                                ${cvData.font === fontKey ? "border-white " : "border-black/40"}
+                                `}
+                            >
+                                {fontData.name}
+                            </button>
+
+                        ))}
+
+
+                    </div>
 
                 </div>
+                
+                
 
 
             </Accordion>

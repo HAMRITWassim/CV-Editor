@@ -4,11 +4,29 @@ import { useEffect, useRef, useState } from "react";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { IoPhonePortraitOutline } from "react-icons/io5";
 
-import { THEMES, DEFAULT_LAYOUT } from "../constants/themes"
+import { THEMES, DEFAULT_LAYOUT, FONTS } from "../constants/themes"
 
-export default function CVPreview({cvData, setCvData}){
+export default function CVPreview({cvData, setCvData, previewColor}){
 
-    const currentTheme = THEMES[cvData.theme || "marron"]
+    
+    const activeTheme = previewColor || cvData.theme || "marron";
+
+
+    const currentTheme = THEMES[activeTheme] || THEMES.marron;
+
+    // Police par défaut : "Sans"
+    const currentFontValue = FONTS[cvData.font]?.value || FONTS.sans.value;
+
+    const isCustomColor = activeTheme?.startsWith("#");
+
+    // Couleur principale
+    const mainColor = isCustomColor ? activeTheme : currentTheme.primary;
+
+    // Couleur secondaire
+    // Pour les couleurs custom, applique "26" à la fin du code HEXA (équivaut à une opacité de 15%)
+    const lightColor = isCustomColor ? `${activeTheme}26` : currentTheme.light;
+
+
 
     const translateLevel = (level) => {
         if (cvData.lang === "FR")
@@ -166,7 +184,7 @@ export default function CVPreview({cvData, setCvData}){
                 case "skills":
                     blockContent = (
                     <>
-                        <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: currentTheme.primary }}>{cvData.lang === "EN" ? "Skills" : "Compétences"}</h1>
+                        <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: mainColor }}>{cvData.lang === "EN" ? "Skills" : "Compétences"}</h1>
                         <hr className="border-t border-[#e3e3e3] mb-3" />
                         <ul className="flex flex-col gap-2">
 
@@ -175,7 +193,7 @@ export default function CVPreview({cvData, setCvData}){
 
                                     <li key={skill._id || skill.id || index} className="text-sm text-gray-700 font-medium flex items-center overflow-clip">
                                         
-                                        <span className="w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: currentTheme.primary }}></span>
+                                        <span className="w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mainColor }}></span>
                                         {skill.name}
 
                                     </li>
@@ -193,7 +211,7 @@ export default function CVPreview({cvData, setCvData}){
                 case "languages":
                     blockContent = (
                     <>
-                        <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: currentTheme.primary }}>
+                        <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: mainColor }}>
                             {cvData.lang === "EN" ? "Languages" : "Langues"}
                         </h1>
 
@@ -223,7 +241,7 @@ export default function CVPreview({cvData, setCvData}){
                     blockContent = (
                     <>
 
-                        <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: currentTheme.primary }}>
+                        <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: mainColor }}>
                             {cvData.lang === "EN" ? "Work Experience" : "Expériences Pro."}
                         </h1>
                         <hr className="border-t border-[#e3e3e3] mb-4" />
@@ -240,7 +258,7 @@ export default function CVPreview({cvData, setCvData}){
 
                                             <h3 className="font-bold text-gray-900">{experience.position || "Poste"}</h3>
 
-                                            <span className="text-xs font-semibold rounded-md px-1 py-0.5 whitespace-nowrap shrink-0" style={{ color: currentTheme.primary, backgroundColor: currentTheme.light }}>
+                                            <span className="text-xs font-semibold rounded-md px-1 py-0.5 whitespace-nowrap shrink-0" style={{ color: mainColor, backgroundColor: lightColor }}>
                                                 {toNumericDateFormat(experience.startDate)} {toNumericDateFormat(experience.startDate) && toNumericDateFormat(experience.endDate) && " - "} {toNumericDateFormat(experience.endDate)}
                                             </span>
 
@@ -271,7 +289,7 @@ export default function CVPreview({cvData, setCvData}){
                     blockContent = (
                     <>
 
-                        <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: currentTheme.primary }}>
+                        <h1 className="text-sm font-bold tracking-wider uppercase mb-1" style={{ color: mainColor }}>
                             {cvData.lang === "EN" ? "Education" : "Formations"}
                         </h1>
 
@@ -288,7 +306,7 @@ export default function CVPreview({cvData, setCvData}){
 
                                             <h3 className="font-bold text-gray-900">{formation.degree || "Diplôme"}</h3>
 
-                                            <span className="text-xs font-semibold rounded-md px-1 py-0.5 whitespace-nowrap shrink-0" style={{ color: currentTheme.primary, backgroundColor: currentTheme.light }}>
+                                            <span className="text-xs font-semibold rounded-md px-1 py-0.5 whitespace-nowrap shrink-0" style={{ color: mainColor, backgroundColor: lightColor }}>
                                                 {toNumericDateFormat(formation.startDate)} {toNumericDateFormat(formation.startDate) && toNumericDateFormat(formation.endDate) && " - "} {toNumericDateFormat(formation.endDate)}
                                             </span>
 
@@ -383,7 +401,7 @@ export default function CVPreview({cvData, setCvData}){
                 <div 
                 id="cv-to-print" 
                 className={`bg-white shadow-2xl p-10 flex flex-col w-full h-full transition-all duration-300 ${isLayoutMode ? "ring-4 ring-[#fccc69] ring-offset-4" : ""}`}
-                style={{ fontFamily: currentTheme.font }}
+                style={{ fontFamily: currentFontValue }}
                 >
 
                     {/* HEADER */}
@@ -394,7 +412,7 @@ export default function CVPreview({cvData, setCvData}){
                             cvData.personalInfo.firstName || "Prénom"} 
                         </h1>
 
-                        <h2 className="text-xl font-bold text-center" style={{ color: currentTheme.primary }}>
+                        <h2 className="text-xl font-bold text-center" style={{ color: mainColor }}>
                             {cvData.personalInfo.jobTitle || "Titre du poste"}
                         </h2>
 
