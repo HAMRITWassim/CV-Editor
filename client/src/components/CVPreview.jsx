@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 
 // ICONS
-import { MdOutlineMailOutline } from "react-icons/md";
-import { IoPhonePortraitOutline } from "react-icons/io5";
+import { IoPhonePortraitOutline, IoSaveOutline  } from "react-icons/io5";
+import { MdOutlineMailOutline, MdFormatAlignLeft, MdFormatAlignCenter, MdFormatAlignRight } from "react-icons/md"
 
 import { THEMES, DEFAULT_LAYOUT, FONTS } from "../constants/themes"
+
+import toast from "react-hot-toast";
+
 
 export default function CVPreview({cvData, setCvData, previewColor}){
 
@@ -172,10 +175,56 @@ export default function CVPreview({cvData, setCvData, previewColor}){
         // Savoir si on est en mode MISE EN PAGE
         const [isLayoutMode, setIsLayoutMode] = useState(false);
 
+        // Pt de sauvegarde du layout
+        const [layoutSnapshot, setLayoutSnapshot] = useState(null);
+
+        // Entre en mode Layout
+        const handleEnterLayoutMode = () => {
+            setLayoutSnapshot(JSON.parse(JSON.stringify(cvData.layout || DEFAULT_LAYOUT))); // Copie du Layout actuel
+            setIsLayoutMode(true);
+        }
+
+        // Valide les changements du mode Layout
+        const handleValidateLayout = () => {
+            setIsLayoutMode(false);
+            setLayoutSnapshot(null); // Vide la sauvegarde 
+
+            toast.success("Mise en page sauvegardée !", {icon: <IoSaveOutline />})
+        }
+
+        // Annule les changements du mode Layout
+        const handleCancelLayout = () => {
+            if(layoutSnapshot) {
+                setCvData({ ...cvData, layout: layoutSnapshot }); // On repasse sur le layout avant les changements
+            }
+
+            setIsLayoutMode(false);
+            setLayoutSnapshot(null);
+
+            toast("Modifications annulées", {icon: "↩️"})
+        }
+
+        // Fct pour changer l'alignement du texte dans 1 colonne
+        const handleAlignColumn = (colIndex, align) => {
+            const currentLayout = cvData.layout || DEFAULT_LAYOUT;
+            const newLayout = JSON.parse(JSON.stringify(currentLayout));
+
+            // Sauvegarde de l'alignement dans colonne
+            newLayout[colIndex].alignment = align;
+            setCvData({ ...cvData, layout: newLayout });
+            
+        };
+
         const layoutToRender = cvData.layout || DEFAULT_LAYOUT;
 
         // Créé le rendu visuel d'une section du CV selon son nom (Ajoute un style visuel si l'on est en mode édition)
         const renderBlock = (blockName, colIndex, itemIndex) => {
+
+            // Lit l'alignement de la colonne
+            const colAlign = layoutToRender[colIndex].alignment || "left";
+
+            // Créé la classe flex selon l'alignement de la colonne
+            const justifyClass = colAlign === "center" ? "justify-center" : colAlign === "right" ? "justify-end" : "justify-start";
 
             let blockContent = null;
 
@@ -191,7 +240,7 @@ export default function CVPreview({cvData, setCvData, previewColor}){
                             {cvData.skills.length > 0 ? (
                                 cvData.skills.map((skill, index) => (
 
-                                    <li key={skill._id || skill.id || index} className="text-sm text-gray-700 font-medium flex items-center overflow-clip">
+                                    <li key={skill._id || skill.id || index} className={`text-sm text-gray-700 font-medium flex items-center overflow-clip ${justifyClass}`}>
                                         
                                         <span className="w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mainColor }}></span>
                                         {skill.name}
@@ -380,19 +429,40 @@ export default function CVPreview({cvData, setCvData, previewColor}){
                 }}
             >
                 
-                {/* BOUTON FLOTTANT (apparait au survol de la zone) */}
-                <button 
-                    onClick={() => setIsLayoutMode(!isLayoutMode)}
-                    className={`
-                        absolute -top-2 -right-12 -translate-x-1/2 z-50 px-6 py-2 rounded-full font-bold shadow-lg transition-all duration-300 cursor-pointer scale-120
-                        ${isLayoutMode 
-                            ? "bg-red-500 text-white hover:bg-red-600" 
-                            : "bg-transparent border-2 border-[#4a2307]/80 text-[#4a2307]/80 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 hover:bg-gray-500/20"
-                        }
-                    `}
-                >
-                    {isLayoutMode ? "Valider la mise en page" : "Modifier la mise en page"}
-                </button>
+                {/* BOUTONS FLOTTANTS */}
+                <div className={`absolute -top-4 right-10 z-50 flex gap-3 transition-all duration-300 ${!isLayoutMode ? "opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0" : "scale-105 -translate-y-2"}`}>
+                    
+                    {!isLayoutMode ? (
+
+                        // BOUTON "MODIFIER" (Mode normal)
+                        <button 
+                            onClick={handleEnterLayoutMode}
+                            className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-transparent backdrop-blur-sm border-3 border-[#4a2307]/70 text-[#4a2307]/80 hover:bg-[#4a2307]/10"
+                        >
+                            Modifier la mise en page
+                        </button>
+
+                    ) : (
+
+                        // BOUTONS "Annuler" & "Valider" (Mode Layout)
+                        <>
+                            <button 
+                                onClick={handleCancelLayout}
+                                className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-gray-500 text-white hover:bg-gray-600"
+                            >
+                                Annuler
+                            </button>
+
+                            <button 
+                                onClick={handleValidateLayout}
+                                className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-green-500 text-white hover:bg-green-600 "
+                            >
+                                Valider
+                            </button>
+                        </>
+                    )}
+
+                </div>
 
 
 
@@ -441,9 +511,10 @@ export default function CVPreview({cvData, setCvData, previewColor}){
 
                             <div
                             key={col.id || colIndex}
-                            className={`flex flex-col gap-6 transition-all duration-300 
+                            className={`group/col relative flex flex-col gap-6 transition-all duration-300 
                                         ${col.size === 1 ? 'w-1/3' : 'w-2/3'}
                                         ${isLayoutMode ? "border-4 border-dashed border-gray-200 p-2 rounded bg-gray-50/50 cursor-grab active:cursor-grabbing" : ""}
+                                        ${col.alignment === "center" ? "text-center" : col.alignment === "right" ? "text-right" : "text-left"}
                             `}
 
                             // DRAG & DROP (Colonnes)
@@ -464,6 +535,41 @@ export default function CVPreview({cvData, setCvData, previewColor}){
                             }}
                             
                             >
+
+                                {/* BARRE D'OUTILS D'ALIGNEMENT (Mode Layout) */}
+                                {isLayoutMode && (
+                                    <div 
+                                        
+                                        className="opacity-0 group-hover/col:opacity-100 transition-opacity duration-200 absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10 bg-white p-1 rounded-md shadow-md border border-gray-200 cursor-default" 
+                                        draggable
+                                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }} // Évite de déplacer toute la colonne lors du clic
+                                        onPointerDown={(e) => e.stopPropagation()} 
+                                    >
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); handleAlignColumn(colIndex, "left"); }}
+                                            className={`p-1.5 rounded transition-colors ${col.alignment === "left" || !col.alignment ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
+                                            title="Aligner à gauche"
+                                        >
+                                            <MdFormatAlignLeft />
+                                        </button>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); handleAlignColumn(colIndex, "center"); }}
+                                            className={`p-1.5 rounded transition-colors ${col.alignment === "center" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
+                                            title="Centrer"
+                                        >
+                                            <MdFormatAlignCenter />
+                                        </button>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); handleAlignColumn(colIndex, "right"); }}
+                                            className={`p-1.5 rounded transition-colors ${col.alignment === "right" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
+                                            title="Aligner à droite"
+                                        >
+                                            <MdFormatAlignRight />
+                                        </button>
+                                    </div>
+                                )}
+
+
                                 {/* Dessine tous les items (skills, languages...) */}
                                 {col.items.map((item, itemIndex) => renderBlock(item, colIndex, itemIndex))}
 
