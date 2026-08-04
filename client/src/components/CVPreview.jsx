@@ -215,6 +215,17 @@ export default function CVPreview({cvData, setCvData, previewColor}){
             
         };
 
+        // Fct pour changer l'alignement du Header
+        const handleAlignHeader = (align) => {
+            setCvData({ ...cvData, headerAlignment: align });
+        };
+
+        // Classes CSS dynamiques pour le Header
+        const headerAlign = cvData.headerAlignment || "left";
+        const headerFlexClass = headerAlign === "center" ? "items-center" : headerAlign === "right" ? "items-end" : "items-start";
+        const headerTextClass = headerAlign === "center" ? "text-center" : headerAlign === "right" ? "text-right" : "text-left";
+        const headerJustifyClass = headerAlign === "center" ? "justify-center" : headerAlign === "right" ? "justify-end" : "justify-start";
+
         const layoutToRender = cvData.layout || DEFAULT_LAYOUT;
 
         // Créé le rendu visuel d'une section du CV selon son nom (Ajoute un style visuel si l'on est en mode édition)
@@ -225,6 +236,10 @@ export default function CVPreview({cvData, setCvData, previewColor}){
 
             // Créé la classe flex selon l'alignement de la colonne
             const justifyClass = colAlign === "center" ? "justify-center" : colAlign === "right" ? "justify-end" : "justify-start";
+
+            const headerFlexClass = colAlign === "center" ? "flex flex-col items-center gap-1"  // Centre  
+                : colAlign === "right" ? "flex flex-row-reverse justify-between items-baseline" // Droite
+                : "flex flex-row justify-between items-baseline";   // Gauche
 
             let blockContent = null;
 
@@ -303,7 +318,7 @@ export default function CVPreview({cvData, setCvData, previewColor}){
                                     <div key={experience._id || experience.id || index} className="flex flex-col">
                                         
                                         {/* En-tête de l'expérience (Titre, date..)*/}
-                                        <div className="flex justify-between items-baseline mb-1">
+                                        <div className={`${headerFlexClass} mb-1 w-full`}>
 
                                             <h3 className="font-bold text-gray-900">{experience.position || "Poste"}</h3>
 
@@ -351,7 +366,7 @@ export default function CVPreview({cvData, setCvData, previewColor}){
 
                                     <div key={formation._id || formation.id || index} className="flex flex-col">
 
-                                        <div className="flex justify-between items-baseline mb-1">
+                                        <div className={`${headerFlexClass} mb-1 w-full`}>
 
                                             <h3 className="font-bold text-gray-900">{formation.degree || "Diplôme"}</h3>
 
@@ -475,7 +490,39 @@ export default function CVPreview({cvData, setCvData, previewColor}){
                 >
 
                     {/* HEADER */}
-                    <header className="flex flex-col items-start gap-1">
+                    <header className={`group/header relative flex flex-col gap-1 transition-all duration-300 ${headerFlexClass} ${headerTextClass}
+                    ${isLayoutMode ? "border-4 border-dashed border-gray-200 pt-12 px-4 pb-4 rounded bg-gray-50/50" : ""}
+                    `}>
+
+                        {isLayoutMode && (
+                            <div 
+                                className="opacity-0 group-hover/header:opacity-100 transition-opacity duration-200 absolute top-2 left-1/2 -translate-x-1/2 flex gap-1 z-10 bg-white p-1 rounded-md shadow-md border border-gray-200 cursor-default" 
+                                onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }} 
+                                onPointerDown={(e) => e.stopPropagation()} 
+                            >
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); handleAlignHeader("left"); }}
+                                    className={`p-1.5 rounded transition-colors ${headerAlign === "left" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
+                                    title="Aligner à gauche"
+                                >
+                                    <MdFormatAlignLeft />
+                                </button>
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); handleAlignHeader("center"); }}
+                                    className={`p-1.5 rounded transition-colors ${headerAlign === "center" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
+                                    title="Centrer"
+                                >
+                                    <MdFormatAlignCenter />
+                                </button>
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); handleAlignHeader("right"); }}
+                                    className={`p-1.5 rounded transition-colors ${headerAlign === "right" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
+                                    title="Aligner à droite"
+                                >
+                                    <MdFormatAlignRight />
+                                </button>
+                            </div>
+                        )}
 
                         <h1 className="text-3xl font-bold text-center">
                             <span className="uppercase"> {cvData.personalInfo.lastName || "NOM"} </span>{
@@ -488,7 +535,7 @@ export default function CVPreview({cvData, setCvData, previewColor}){
 
                         <h3 className="text-gray-500 text-sm flex gap-3">
 
-                            <p className="flex items-center"> 
+                            <p className={`flex items-center w-full ${headerJustifyClass}`}> 
                                 <MdOutlineMailOutline className="mr-1"/> {cvData.personalInfo.email || "E-mail"} 
                             </p>
 
