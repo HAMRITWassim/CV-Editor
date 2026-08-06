@@ -22,6 +22,15 @@ const cvSchema = new mongoose.Schema({
         default: "marron"
     },
 
+    // Template du CV utilisée
+    template: { type: String, default: "classic" },
+
+    // Police d'écriture
+    font: { type: String, default: "sans" },
+
+    // Alignement du Header
+    headerAlignment: { type: String, default: "left" },
+
     // Structure des blocs du CV
     layout: {
         type: Array,

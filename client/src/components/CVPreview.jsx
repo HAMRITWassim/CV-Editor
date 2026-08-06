@@ -228,6 +228,86 @@ export default function CVPreview({cvData, setCvData, previewColor}){
 
         const layoutToRender = cvData.layout || DEFAULT_LAYOUT;
 
+        // Fct qui dessine le Header
+        const renderHeader = () => (
+
+            <header 
+            className={`group/header relative flex flex-col gap-1 transition-all duration-300 ${headerFlexClass} ${headerTextClass}
+            ${isLayoutMode ? "border-4 border-dashed border-gray-200 pt-12 px-4 pb-4 rounded bg-gray-50/50" : ""}`}
+            >
+
+                {isLayoutMode && (
+
+                    <div 
+                        className="opacity-0 group-hover/header:opacity-100 transition-opacity duration-200 absolute top-2 left-1/2 -translate-x-1/2 flex gap-1 z-10 bg-white p-1 rounded-md shadow-md border border-gray-200 cursor-default" 
+                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }} 
+                        onPointerDown={(e) => e.stopPropagation()} 
+                    >
+
+                        <button onClick={(e) => { e.stopPropagation(); handleAlignHeader("left"); }} className={`p-1.5 rounded transition-colors ${headerAlign === "left" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`} title="Aligner à gauche"><MdFormatAlignLeft /></button>
+                        <button onClick={(e) => { e.stopPropagation(); handleAlignHeader("center"); }} className={`p-1.5 rounded transition-colors ${headerAlign === "center" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`} title="Centrer"><MdFormatAlignCenter /></button>
+                        <button onClick={(e) => { e.stopPropagation(); handleAlignHeader("right"); }} className={`p-1.5 rounded transition-colors ${headerAlign === "right" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`} title="Aligner à droite"><MdFormatAlignRight /></button>
+                    
+                    </div>
+                )}
+
+
+                <h1 className="text-3xl font-bold">
+                    <span className="uppercase"> {cvData.personalInfo.lastName || "NOM"} </span>{cvData.personalInfo.firstName || "Prénom"} 
+                </h1>
+
+                <h2 className="text-xl font-bold" style={{ color: mainColor }}>
+                    {cvData.personalInfo.jobTitle || "Titre du poste"}
+                </h2>
+                
+                <h3 className={`text-gray-500 text-sm flex gap-3 w-full ${headerJustifyClass}`}>
+                    <p className="flex items-center"> <MdOutlineMailOutline className="mr-1"/> {cvData.personalInfo.email || "E-mail"} </p>
+                    <p className="flex items-center"> <IoPhonePortraitOutline className="mr-1"/> {cvData.personalInfo.phone || "N° de téléphone"} </p>
+                </h3>
+
+            </header>
+        );
+
+        // Fct qui dessine une colonne
+        const renderColumn = (col, colIndex) => {
+            const isModernSidebar = cvData.template === "modern" && colIndex === 0;
+            
+            // Largeur : 100% en mode moderne (le conteneur gère la taille), sinon on lit la taille (1/3 ou 2/3)
+            const widthClass = cvData.template === "modern" ? "w-full" : (col.size === 1 ? 'w-1/3' : 'w-2/3');
+
+            return (
+                <div
+                    key={col.id || colIndex}
+                    className={`group/col relative flex flex-col gap-6 transition-all duration-300 h-full
+                                ${widthClass}
+                                ${isLayoutMode ? "border-4 border-dashed border-gray-200 p-2 rounded bg-gray-50/50 cursor-grab active:cursor-grabbing" : ""}
+                                ${col.alignment === "center" ? "text-center" : col.alignment === "right" ? "text-right" : "text-left"}
+                                ${isModernSidebar ? "p-6 rounded-2xl shadow-sm" : ""} 
+                    `}
+                    style={{ ...(isModernSidebar ? { backgroundColor: lightColor } : {}) }}
+                    draggable={isLayoutMode}
+                    onDragStart={(e) => { if(!isLayoutMode) return; handleDragStart(e, "column", colIndex); }}
+                    onDragOver={(e) => { if(!isLayoutMode) return; e.preventDefault(); }}
+                    onDrop={(e) => { if(!isLayoutMode) return; handleDropOnColumn(e, colIndex); }}
+                >
+                    {isLayoutMode && (
+                        <div 
+                            className="opacity-0 group-hover/col:opacity-100 transition-opacity duration-200 absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10 bg-white p-1 rounded-md shadow-md border border-gray-200 cursor-default" 
+                            draggable onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }} onPointerDown={(e) => e.stopPropagation()} 
+                        >
+                            <button onClick={(e) => { e.stopPropagation(); handleAlignColumn(colIndex, "left"); }} className={`p-1.5 rounded transition-colors ${col.alignment === "left" || !col.alignment ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`} title="Aligner à gauche"><MdFormatAlignLeft /></button>
+                            <button onClick={(e) => { e.stopPropagation(); handleAlignColumn(colIndex, "center"); }} className={`p-1.5 rounded transition-colors ${col.alignment === "center" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`} title="Centrer"><MdFormatAlignCenter /></button>
+                            <button onClick={(e) => { e.stopPropagation(); handleAlignColumn(colIndex, "right"); }} className={`p-1.5 rounded transition-colors ${col.alignment === "right" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`} title="Aligner à droite"><MdFormatAlignRight /></button>
+                        </div>
+                    )}
+                    {col.items.map((item, itemIndex) => renderBlock(item, colIndex, itemIndex))}
+                    {isLayoutMode && col.items.length === 0 && (
+                        <div className="flex-1 flex items-center justify-center text-gray-400 italic text-sm border-2 border-dashed border-gray-300 rounded m-2">Colonne vide</div>
+                    )}
+                </div>
+            );
+        };
+
         // Créé le rendu visuel d'une section du CV selon son nom (Ajoute un style visuel si l'on est en mode édition)
         const renderBlock = (blockName, colIndex, itemIndex) => {
 
@@ -489,149 +569,40 @@ export default function CVPreview({cvData, setCvData, previewColor}){
                 style={{ fontFamily: currentFontValue }}
                 >
 
-                    {/* HEADER */}
-                    <header className={`group/header relative flex flex-col gap-1 transition-all duration-300 ${headerFlexClass} ${headerTextClass}
-                    ${isLayoutMode ? "border-4 border-dashed border-gray-200 pt-12 px-4 pb-4 rounded bg-gray-50/50" : ""}
-                    `}>
-
-                        {isLayoutMode && (
-                            <div 
-                                className="opacity-0 group-hover/header:opacity-100 transition-opacity duration-200 absolute top-2 left-1/2 -translate-x-1/2 flex gap-1 z-10 bg-white p-1 rounded-md shadow-md border border-gray-200 cursor-default" 
-                                onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }} 
-                                onPointerDown={(e) => e.stopPropagation()} 
-                            >
-                                <button 
-                                    onClick={(e) => { e.stopPropagation(); handleAlignHeader("left"); }}
-                                    className={`p-1.5 rounded transition-colors ${headerAlign === "left" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
-                                    title="Aligner à gauche"
-                                >
-                                    <MdFormatAlignLeft />
-                                </button>
-                                <button 
-                                    onClick={(e) => { e.stopPropagation(); handleAlignHeader("center"); }}
-                                    className={`p-1.5 rounded transition-colors ${headerAlign === "center" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
-                                    title="Centrer"
-                                >
-                                    <MdFormatAlignCenter />
-                                </button>
-                                <button 
-                                    onClick={(e) => { e.stopPropagation(); handleAlignHeader("right"); }}
-                                    className={`p-1.5 rounded transition-colors ${headerAlign === "right" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
-                                    title="Aligner à droite"
-                                >
-                                    <MdFormatAlignRight />
-                                </button>
+                   {cvData.template === "modern" ? (
+                        
+                        // --- TEMPLATE MODERNE (Sidebar toute la hauteur à gauche) ---
+                        <div className="flex w-full h-full gap-8">
+                            
+                            {/* Colonne gauche colorée */}
+                            <div className={layoutToRender[0]?.size === 1 ? 'w-1/3' : 'w-2/3'}>
+                                {layoutToRender[0] && renderColumn(layoutToRender[0], 0)}
                             </div>
-                        )}
-
-                        <h1 className="text-3xl font-bold text-center">
-                            <span className="uppercase"> {cvData.personalInfo.lastName || "NOM"} </span>{
-                            cvData.personalInfo.firstName || "Prénom"} 
-                        </h1>
-
-                        <h2 className="text-xl font-bold text-center" style={{ color: mainColor }}>
-                            {cvData.personalInfo.jobTitle || "Titre du poste"}
-                        </h2>
-
-                        <h3 className="text-gray-500 text-sm flex gap-3">
-
-                            <p className={`flex items-center w-full ${headerJustifyClass}`}> 
-                                <MdOutlineMailOutline className="mr-1"/> {cvData.personalInfo.email || "E-mail"} 
-                            </p>
-
-                            <p className="flex items-center"> 
-                                <IoPhonePortraitOutline className="mr-1"/> {cvData.personalInfo.phone || "N° de téléphone"} 
-                            </p>
                             
-                            
-                        </h3>
-            
-                    </header>
-
-                    <hr className="border-t border-[#e3e3e3] my-4" />
-                    
-                    {/*  CORPS DU CV (2 COLONNES) */}
-                    <div className="flex w-full gap-4 min-h-[500px]">
-                            
-                        {/* Boucle sur les colonnes */}
-                        {layoutToRender.map((col, colIndex) => (
-
-                            <div
-                            key={col.id || colIndex}
-                            className={`group/col relative flex flex-col gap-6 transition-all duration-300 
-                                        ${col.size === 1 ? 'w-1/3' : 'w-2/3'}
-                                        ${isLayoutMode ? "border-4 border-dashed border-gray-200 p-2 rounded bg-gray-50/50 cursor-grab active:cursor-grabbing" : ""}
-                                        ${col.alignment === "center" ? "text-center" : col.alignment === "right" ? "text-right" : "text-left"}
-                            `}
-
-                            // DRAG & DROP (Colonnes)
-                            draggable={isLayoutMode}
-                            onDragStart={(e) => {
-                                if(!isLayoutMode) return;
-                                handleDragStart(e, "column", colIndex);
-                            }}
-
-                            onDragOver={(e) => {
-                                if(!isLayoutMode) return;
-                                e.preventDefault(); // Autorise le survol d'une Colonne sur une autre
-                            }}
-
-                            onDrop={(e) => {
-                                if(!isLayoutMode) return;
-                                handleDropOnColumn(e, colIndex);
-                            }}
-                            
-                            >
-
-                                {/* BARRE D'OUTILS D'ALIGNEMENT (Mode Layout) */}
-                                {isLayoutMode && (
-                                    <div 
-                                        
-                                        className="opacity-0 group-hover/col:opacity-100 transition-opacity duration-200 absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10 bg-white p-1 rounded-md shadow-md border border-gray-200 cursor-default" 
-                                        draggable
-                                        onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }} // Évite de déplacer toute la colonne lors du clic
-                                        onPointerDown={(e) => e.stopPropagation()} 
-                                    >
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); handleAlignColumn(colIndex, "left"); }}
-                                            className={`p-1.5 rounded transition-colors ${col.alignment === "left" || !col.alignment ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
-                                            title="Aligner à gauche"
-                                        >
-                                            <MdFormatAlignLeft />
-                                        </button>
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); handleAlignColumn(colIndex, "center"); }}
-                                            className={`p-1.5 rounded transition-colors ${col.alignment === "center" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
-                                            title="Centrer"
-                                        >
-                                            <MdFormatAlignCenter />
-                                        </button>
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); handleAlignColumn(colIndex, "right"); }}
-                                            className={`p-1.5 rounded transition-colors ${col.alignment === "right" ? "bg-[#fccc69] text-[#311603]" : "text-gray-400 hover:bg-gray-100"}`}
-                                            title="Aligner à droite"
-                                        >
-                                            <MdFormatAlignRight />
-                                        </button>
-                                    </div>
-                                )}
-
-
-                                {/* Dessine tous les items (skills, languages...) */}
-                                {col.items.map((item, itemIndex) => renderBlock(item, colIndex, itemIndex))}
-
-                                {isLayoutMode && col.items.length === 0 && (
-                                    <div className="flex-1 flex items-center justify-center text-gray-400 italic text-sm border-2 border-dashed border-gray-300 rounded m-2">
-                                        Colonne vide
-                                    </div>
-                                )}
-
-
+                            {/* Header + Contenu principal */}
+                            <div className={`flex flex-col h-full ${layoutToRender[1]?.size === 1 ? 'w-1/3' : 'w-2/3'}`}>
+                                {renderHeader()}
+                                <hr className="border-t border-[#e3e3e3] my-6" />
+                                {layoutToRender[1] && renderColumn(layoutToRender[1], 1)}
                             </div>
 
-                        ))}
+                        </div>
+
+                    ) : (
+
+                        // --- TEMPLATE CLASSIQUE  ---
+                        <div className="flex flex-col w-full h-full">
+                            {renderHeader()}
+                            <hr className="border-t border-[#e3e3e3] my-4" />
                             
-                    </div>     
+                            <div className="flex w-full gap-4 flex-1">
+                                {layoutToRender.map((col, colIndex) => renderColumn(col, colIndex))}
+                            </div>
+                        </div>
+
+                    )}
+                            
+                      
 
 
                 </div>                            

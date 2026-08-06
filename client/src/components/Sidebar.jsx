@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // ICONES 
 import { IoLanguageSharp, IoArrowUp, IoArrowDown } from "react-icons/io5";
@@ -41,7 +41,14 @@ export default function Sidebar({
 
     const [customColors, setCustomColors] = useState([]);
 
-
+    // Récupère la couleur au chargement de la page
+    useEffect(() => {
+        // Si le CV est coloré avec une couleur custom qui n'est pas dans la sidebar
+        if (cvData.theme?.startsWith("#") && !customColors.includes(cvData.theme)) {
+            // Ajout à la sidebar
+            setCustomColors((prev) => [...prev, cvData.theme]);
+        }
+    }, [cvData.theme]);
 
 
     // Fct de validation de la couleur custom
@@ -1035,6 +1042,35 @@ export default function Sidebar({
             onClick={(isOpen) => handleAccordionToggle(isOpen)}
             isSidebarOpen={openAccordionsCount > 0}
             >
+
+                {/* SECTION TEMPLATES */}
+                <div className="mb-6">
+                    <h3 className="font-bold mb-2">Modèle du CV</h3>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => setCvData({ ...cvData, template: "classic" })}
+                            className={`flex-1 py-2 rounded-lg border-2 font-bold transition-all ${ cvData.template === "classic" || !cvData.template 
+                                ? "border-[#fccc69] bg-[#fccc69]/20 text-[#fccc69]" 
+                                : "border-gray-500/50 text-gray-400 hover:border-gray-400"
+                            }`}
+                        >
+                            Classique
+                        </button>
+                        <button
+                            onClick={() => setCvData({ ...cvData, template: "modern" })}
+                            className={`flex-1 py-2 rounded-lg border-2 font-bold transition-all ${ cvData.template === "modern" 
+                                ? "border-[#fccc69] bg-[#fccc69]/20 text-[#fccc69]" 
+                                : "border-gray-500/50 text-gray-400 hover:border-gray-400"
+                            }`}
+                        >
+                            Moderne
+                        </button>
+                    </div>
+                </div>
+                
+                <hr className="border-t border-[#61310e]/70 my-6" />
+
+
                 {/* SECTION COULEURS */}
                 <div className="mb-6">
 
@@ -1140,6 +1176,8 @@ export default function Sidebar({
                     </div>
                 </div>
 
+                <hr className="border-t border-[#61310e]/70 my-6" />
+                
 
                 {/* SECTION POLICES */}
                 <div className="mb-6">
@@ -1152,8 +1190,8 @@ export default function Sidebar({
                             key={fontKey}
                             onClick={() => setCvData({...cvData, font:fontKey})}
                             style={{fontFamily: fontData.value}} //affiche le bouton avec sa police associée
-                            className={`p-2 border-2 text-left rounded-md hover:bg-black/10 transition-colors cursor-pointer
-                                ${cvData.font === fontKey ? "border-white " : "border-black/40"}
+                            className={`p-2 border-2 text-left rounded-md  transition-colors cursor-pointer
+                                ${cvData.font === fontKey ? "border-[#fccc69] bg-[#fccc69]/20 text-[#fccc69]" : "border-gray-500/50 text-gray-400 hover:border-gray-400"}
                                 `}
                             >
                                 {fontData.name}

@@ -18,6 +18,7 @@ function App() {
 		lang: "FR",
 		theme: "marron",
 		font: "sans",
+		template: "classic",
 		layout: [
             { id: "col-small", size: 1, items: ["skills", "languages"] },
             { id: "col-large", size: 2, items: ["experiences", "education"] }
