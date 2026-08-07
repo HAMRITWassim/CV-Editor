@@ -47,10 +47,6 @@ function App() {
 	// CV actuel (Cv de l'historique pointé par son index)
 	const cvData = historyState.history[historyState.currentIndex];
 
-	// Prévisualisation des couleurs
-    const [isPickerOpen, setIsPickerOpen] = useState(false);
-    const [tempColor, setTempColor] = useState("#000000");
-
 
 	const setCvData = (action) => {
 
@@ -327,16 +323,12 @@ function App() {
 					setSpellErrors={setSpellErrors} 
 					isCheckingSpelling={isCheckingSpelling} 
 					handleSpellCheck={handleSpellCheck}
-					isPickerOpen={isPickerOpen}
-					setIsPickerOpen={setIsPickerOpen}
-					tempColor={tempColor}
-					setTempColor={setTempColor}
 					/>
 
 					<main className="flex-1 bg-[#F5EFE6] flex justify-center items-center p-8 overflow-hidden">
 						
 						{/* FEUILLE DE PREVISUALISATION DU CV */}
-						<CVPreview cvData={cvData} setCvData={setCvData} previewColor={isPickerOpen ? tempColor : null}/>
+						<CVPreview cvData={cvData} setCvData={setCvData}/>
 
 					</main>
 

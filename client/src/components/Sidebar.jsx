@@ -26,10 +26,6 @@ export default function Sidebar({
     setSpellErrors, 
     isCheckingSpelling, 
     handleSpellCheck, 
-    isPickerOpen,
-    setIsPickerOpen,
-    tempColor,
-    setTempColor
 }){
 
     //STATES
@@ -41,14 +37,27 @@ export default function Sidebar({
 
     const [customColors, setCustomColors] = useState([]);
 
+    const [originalColor, setOriginalColor] = useState("");
+
+    const [isPickerOpen, setIsPickerOpen] = useState(false);
+
     // Récupère la couleur au chargement de la page
     useEffect(() => {
-        // Si le CV est coloré avec une couleur custom qui n'est pas dans la sidebar
-        if (cvData.theme?.startsWith("#") && !customColors.includes(cvData.theme)) {
-            // Ajout à la sidebar
-            setCustomColors((prev) => [...prev, cvData.theme]);
+        
+        //  !isPickerOpen empèche le spam de couleur dans la sidebar
+        if (!isPickerOpen && cvData.theme?.startsWith("#")) {
+            
+            // Màj
+            setCustomColors((prev) => {
+                // Vérifie si la couleur custom est déjà dans la liste
+                if (prev.includes(cvData.theme)) {
+                    return prev; 
+                }
+                return [...prev, cvData.theme]; // On l'ajoute si elle ne l'est pas
+            });
+            
         }
-    }, [cvData.theme]);
+    }, [cvData.theme, isPickerOpen]);  
 
 
     // Fct de validation de la couleur custom
@@ -1112,8 +1121,8 @@ export default function Sidebar({
                         <button 
                         className='flex justify-center items-center w-10 h-10 rounded-full border-dashed border-2 transition-all duration-200 cursor-pointer hover:shadow-lg text-gray-500 hover:text-gray-200'
                         onClick={() => {
-                            // Initialise avec la couleur actuelle
-                            setTempColor(cvData.theme?.startsWith("#") ? cvData.theme : "#171717");
+                            // Mémorise la couleur actuelle
+                            setOriginalColor(cvData.theme)
                             
                             setIsPickerOpen(!isPickerOpen);
                         }}
@@ -1127,12 +1136,12 @@ export default function Sidebar({
                         </button>
 
                         {isPickerOpen && (
-                            <div className="absolute top-10 left-0 z-50 bg-white p-4 rounded-xl shadow-2xl border border-gray-200 flex flex-col gap-4 w-[220px]">
+                            <div className="absolute top-10 left-0 z-50 bg-white p-4 rounded-xl shadow-2xl border border-gray-200 flex flex-col gap-4 w-55">
 
                                 {/* COLOR PICKER */}
                                 <HexColorPicker 
-                                    color={tempColor} 
-                                    onChange={setTempColor} 
+                                    color={cvData.theme?.startsWith("#") ? cvData.theme : "#171717"} // lit la couleur du CV
+                                    onChange={(newColor) => setCvData({ ...cvData, theme: newColor })} 
                                     style={{ width: "100%", height: "150px" }}
                                 />
 
@@ -1140,10 +1149,10 @@ export default function Sidebar({
                                 <div className="flex items-center gap-2">
                                     <div 
                                         className="w-6 h-6 rounded border shadow-inner" 
-                                        style={{ backgroundColor: tempColor }}
+                                        style={{ backgroundColor: cvData.theme?.startsWith("#") ? cvData.theme : "#171717" }}
                                     ></div>
                                     <span className="text-sm font-mono text-gray-600 uppercase">
-                                        {tempColor}
+                                        {cvData.theme?.startsWith("#") ? cvData.theme : "#171717"}
                                     </span>
                                 </div>
 
@@ -1151,7 +1160,11 @@ export default function Sidebar({
                                 <div className="flex justify-between items-center mt-1">
 
                                     <button 
-                                        onClick={() => setIsPickerOpen(false)}
+                                        onClick={() => {
+                                            // Annuler -> Remet l'ancienne couleur du CV
+                                            setCvData({ ...cvData, theme: originalColor });
+                                            setIsPickerOpen(false)
+                                        }}
                                         className="px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-gray-800 transition-colors"
                                     >
                                         Annuler
@@ -1159,7 +1172,15 @@ export default function Sidebar({
 
 
                                     <button 
-                                        onClick={handleValidateColor}
+                                        onClick={() => {
+                                            // Ajoute la couleur aux couleurs de la section Style (sidebar)
+                                            if (cvData.theme?.startsWith("#") && !customColors.includes(cvData.theme))
+                                            {
+                                                setCustomColors((prev) => [...prev, cvData.theme]);
+                                            }
+
+                                            setIsPickerOpen(false);
+                                        }}
                                         className="px-4 py-1.5 bg-green-500 text-white text-xs font-bold rounded-lg shadow-md hover:bg-green-600 transition-all "
                                     >
                                         Valider

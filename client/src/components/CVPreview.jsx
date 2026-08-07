@@ -9,10 +9,10 @@ import { THEMES, DEFAULT_LAYOUT, FONTS } from "../constants/themes"
 import toast from "react-hot-toast";
 
 
-export default function CVPreview({cvData, setCvData, previewColor}){
+export default function CVPreview({cvData, setCvData}){
 
     
-    const activeTheme = previewColor || cvData.theme || "marron";
+    const activeTheme = cvData.theme || "marron";
 
 
     const currentTheme = THEMES[activeTheme] || THEMES.marron;
