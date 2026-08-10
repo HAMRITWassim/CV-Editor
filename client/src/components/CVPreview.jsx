@@ -228,12 +228,18 @@ export default function CVPreview({cvData, setCvData}){
 
         const layoutToRender = cvData.layout || DEFAULT_LAYOUT;
 
+        // Template de CV "Élégant"
+        const isElegant = cvData.template === "elegant";
+
         // Fct qui dessine le Header
         const renderHeader = () => (
 
             <header 
             className={`group/header relative flex flex-col gap-1 transition-all duration-300 ${headerFlexClass} ${headerTextClass}
-            ${isLayoutMode ? "border-4 border-dashed border-gray-200 pt-12 px-4 pb-4 rounded bg-gray-50/50" : ""}`}
+            ${isLayoutMode ? "border-4 border-dashed border-gray-200 pt-12 px-4 pb-4 rounded bg-gray-50/50" : ""}
+            ${isElegant ? "p-8 rounded-b-3xl shadow-lg mb-4" : ""}`}
+
+            style={{ ...(isElegant ? { backgroundColor: mainColor, color: "white" } : {}) }}
             >
 
                 {isLayoutMode && (
@@ -256,11 +262,11 @@ export default function CVPreview({cvData, setCvData}){
                     <span className="uppercase"> {cvData.personalInfo.lastName || "NOM"} </span>{cvData.personalInfo.firstName || "Prénom"} 
                 </h1>
 
-                <h2 className="text-xl font-bold" style={{ color: mainColor }}>
+                <h2 className="text-xl font-bold" style={{ color: isElegant ? "white" : mainColor }}>
                     {cvData.personalInfo.jobTitle || "Titre du poste"}
                 </h2>
                 
-                <h3 className={`text-gray-500 text-sm flex gap-3 w-full ${headerJustifyClass}`}>
+                <h3 className={`text-gray-500 text-sm flex gap-3 w-full ${headerJustifyClass} ${isElegant ? "text-white/70" : "text-gray-500"} `}>
                     <p className="flex items-center"> <MdOutlineMailOutline className="mr-1"/> {cvData.personalInfo.email || "E-mail"} </p>
                     <p className="flex items-center"> <IoPhonePortraitOutline className="mr-1"/> {cvData.personalInfo.phone || "N° de téléphone"} </p>
                 </h3>
@@ -270,10 +276,11 @@ export default function CVPreview({cvData, setCvData}){
 
         // Fct qui dessine une colonne
         const renderColumn = (col, colIndex) => {
-            const isModernSidebar = cvData.template === "modern" && colIndex === 0;
+            // Applique une couleur à la colonne si ou est en template "Moderne" OU "Inversé"
+            const isModernSidebar = (cvData.template === "modern" || cvData.template === "right-sidebar") && colIndex === 0;
             
             // Largeur : 100% en mode moderne (le conteneur gère la taille), sinon on lit la taille (1/3 ou 2/3)
-            const widthClass = cvData.template === "modern" ? "w-full" : (col.size === 1 ? 'w-1/3' : 'w-2/3');
+            const widthClass = (cvData.template === "modern" || cvData.template === "right-sidebar") ? "w-full" : (col.size === 1 ? 'w-1/3' : 'w-2/3');
 
             return (
                 <div
@@ -569,17 +576,17 @@ export default function CVPreview({cvData, setCvData}){
                 style={{ fontFamily: currentFontValue }}
                 >
 
-                   {cvData.template === "modern" ? (
+                   {cvData.template === "modern" || cvData.template === "right-sidebar" ? (
                         
-                        // --- TEMPLATE MODERNE (Sidebar toute la hauteur à gauche) ---
-                        <div className="flex w-full h-full gap-8">
+                        // --- TEMPLATE "MODERNE" & "INVERSÉ" (Sidebar -> toute la hauteur à gauche) ---
+                        <div className={`flex w-full h-full gap-8 ${cvData.template === "right-sidebar" ? "flex-row-reverse" : "flex-row"}`}>
                             
-                            {/* Colonne gauche colorée */}
+                            {/* Colonne gauche colorée (index 0) */}
                             <div className={layoutToRender[0]?.size === 1 ? 'w-1/3' : 'w-2/3'}>
                                 {layoutToRender[0] && renderColumn(layoutToRender[0], 0)}
                             </div>
                             
-                            {/* Header + Contenu principal */}
+                            {/* Header + Contenu principal (index 1) */}
                             <div className={`flex flex-col h-full ${layoutToRender[1]?.size === 1 ? 'w-1/3' : 'w-2/3'}`}>
                                 {renderHeader()}
                                 <hr className="border-t border-[#e3e3e3] my-6" />
@@ -590,14 +597,16 @@ export default function CVPreview({cvData, setCvData}){
 
                     ) : (
 
-                        // --- TEMPLATE CLASSIQUE  ---
+                        // --- TEMPLATE "CLASSIQUE" & "ELEGANT"  ---
                         <div className="flex flex-col w-full h-full">
+
                             {renderHeader()}
-                            <hr className="border-t border-[#e3e3e3] my-4" />
+                            {!isElegant && <hr className="border-t border-[#e3e3e3] my-4" />}
                             
                             <div className="flex w-full gap-4 flex-1">
                                 {layoutToRender.map((col, colIndex) => renderColumn(col, colIndex))}
                             </div>
+
                         </div>
 
                     )}

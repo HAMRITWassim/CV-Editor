@@ -1055,24 +1055,33 @@ export default function Sidebar({
                 {/* SECTION TEMPLATES */}
                 <div className="mb-6">
                     <h3 className="font-bold mb-2">Modèle du CV</h3>
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap gap-8 items-center py-2">
                         <button
                             onClick={() => setCvData({ ...cvData, template: "classic" })}
-                            className={`flex-1 py-2 rounded-lg border-2 font-bold transition-all ${ cvData.template === "classic" || !cvData.template 
-                                ? "border-[#fccc69] bg-[#fccc69]/20 text-[#fccc69]" 
-                                : "border-gray-500/50 text-gray-400 hover:border-gray-400"
-                            }`}
+                            className={`p-2 rounded-lg border-2 font-bold transition-all ${ cvData.template === "classic" || !cvData.template ? "border-[#fccc69] bg-[#fccc69]/20 text-[#fccc69]" : "border-gray-500/50 text-gray-400 hover:border-gray-400" }`}
                         >
                             Classique
                         </button>
+                        
                         <button
                             onClick={() => setCvData({ ...cvData, template: "modern" })}
-                            className={`flex-1 py-2 rounded-lg border-2 font-bold transition-all ${ cvData.template === "modern" 
-                                ? "border-[#fccc69] bg-[#fccc69]/20 text-[#fccc69]" 
-                                : "border-gray-500/50 text-gray-400 hover:border-gray-400"
-                            }`}
+                            className={`p-2 rounded-lg border-2 font-bold transition-all ${ cvData.template === "modern" ? "border-[#fccc69] bg-[#fccc69]/20 text-[#fccc69]" : "border-gray-500/50 text-gray-400 hover:border-gray-400" }`}
                         >
                             Moderne
+                        </button>
+
+                        <button
+                            onClick={() => setCvData({ ...cvData, template: "elegant" })}
+                            className={`p-2 rounded-lg border-2 font-bold transition-all ${ cvData.template === "elegant" ? "border-[#fccc69] bg-[#fccc69]/20 text-[#fccc69]" : "border-gray-500/50 text-gray-400 hover:border-gray-400" }`}
+                        >
+                            Élégant
+                        </button>
+
+                        <button
+                            onClick={() => setCvData({ ...cvData, template: "right-sidebar" })}
+                            className={`p-2 rounded-lg border-2 font-bold transition-all ${ cvData.template === "right-sidebar" ? "border-[#fccc69] bg-[#fccc69]/20 text-[#fccc69]" : "border-gray-500/50 text-gray-400 hover:border-gray-400" }`}
+                        >
+                            Inversé
                         </button>
                     </div>
                 </div>
