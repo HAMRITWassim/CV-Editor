@@ -9,7 +9,7 @@ import { THEMES, DEFAULT_LAYOUT, FONTS } from "../constants/themes"
 import toast from "react-hot-toast";
 
 
-export default function CVPreview({cvData, setCvData}){
+export default function CVPreview({cvData, setCvData, zoom, setZoom}){
 
     
     const activeTheme = cvData.theme || "marron";
@@ -67,7 +67,8 @@ export default function CVPreview({cvData, setCvData}){
 
 
     const containerRef = useRef(null);
-    const [scale, setScale] = useState(1);
+    const scrollContainerRef = useRef(null); // Ref pour la zone de scroll
+    const [baseScale, setBaseScale] = useState(1);
 
     
     useEffect(() => {
@@ -90,7 +91,7 @@ export default function CVPreview({cvData, setCvData}){
                 const scaleY = (height - padding) / a4Height;
 
                 // Min -> permet de ne pas couper la feuille
-                setScale(Math.min(scaleX, scaleY));
+                setBaseScale(Math.min(scaleX, scaleY));
             }
         });
 
@@ -100,6 +101,35 @@ export default function CVPreview({cvData, setCvData}){
 
         return () => observer.disconnect();
     }, []);
+
+    // Remplace le zoom par défaut du navigateur (CTRL + Molette)
+    useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (!container)
+        {
+            return;
+        }
+
+        const handleWheel = (e) => {
+            // Maintien de CTRL (Windows) ou CMD (Mac)
+            if (e.ctrlKey || e.metaKey){
+                e.preventDefault() // Bloque le zoom par défaut du navigateur
+
+                setZoom((prevZoom) => {
+                    const zoomSensitivity = 0.0005; // Vitesse du zoom
+                    const delta = -e.deltaY * zoomSensitivity;
+                    let newZoom = prevZoom + delta;
+
+                    return Math.min(Math.max(newZoom, 1), 3); // Zoom entre 1x et 3x
+                });
+            }
+        };
+
+        // passive: false --> à inclure pour bloquer un event natif du navigateur
+        document.addEventListener("wheel", handleWheel, {passive: false});
+        
+        return () => container.removeEventListener("wheel", handleWheel);
+    }, [setZoom]);
 
 
         // --------------------------------------------------------- FCTS DE DRAG & DROP
@@ -516,109 +546,124 @@ export default function CVPreview({cvData, setCvData}){
     return(
 
         // Arrière plan (derrière la feuille) 
-        <div ref={containerRef} className="w-full h-full flex justify-center items-center overflow-hidden bg-[#F5EFE6] relative">
+        <div ref={containerRef} className="w-full h-full overflow-hidden bg-[#F5EFE6] relative">
 
-            {/* WRAPPER (on lui fait garder la taille d'une feuille A4) */}
-            <div
-                className="group relative p-12 transition-all duration-300"
-                style={{
-                    width: '890px',
-                    height: '1219px',
-                    transform: `scale(${scale})`,
-                    transformOrigin: 'center center', 
-                    display: 'flex',
-                    flexShrink: 0
-                }}
+            {/* Zone scrollable quand on zoome*/}
+            <div 
+                ref={scrollContainerRef}
+                className={`w-full h-full overflow-auto flex ${zoom > 1 ? "p-10" : "justify-center items-center"} transition-all`}
             >
-                
-                {/* BOUTONS FLOTTANTS */}
-                <div className={`absolute -top-4 right-10 z-50 flex gap-3 transition-all duration-300 ${!isLayoutMode ? "opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0" : "scale-105 -translate-y-2"}`}>
-                    
-                    {!isLayoutMode ? (
-
-                        // BOUTON "MODIFIER" (Mode normal)
-                        <button 
-                            onClick={handleEnterLayoutMode}
-                            className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-transparent backdrop-blur-sm border-3 border-[#4a2307]/70 text-[#4a2307]/80 hover:bg-[#4a2307]/10"
-                        >
-                            Modifier la mise en page
-                        </button>
-
-                    ) : (
-
-                        // BOUTONS "Annuler" & "Valider" (Mode Layout)
-                        <>
-                            <button 
-                                onClick={handleCancelLayout}
-                                className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-gray-500 text-white hover:bg-gray-600"
-                            >
-                                Annuler
-                            </button>
-
-                            <button 
-                                onClick={handleValidateLayout}
-                                className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-green-500 text-white hover:bg-green-600 "
-                            >
-                                Valider
-                            </button>
-                        </>
-                    )}
-
-                </div>
-
-
-
-
-                {/* FEUILLE BLANCHE */}
+                {/* Boite qui prend la taille exacte du CV zoomé (force le scroll)*/}
                 <div 
-                id="cv-to-print" 
-                className={`bg-white shadow-2xl p-10 flex flex-col w-full h-full transition-all duration-300 ${isLayoutMode ? "ring-4 ring-[#fccc69] ring-offset-4" : ""}`}
-                style={{ fontFamily: currentFontValue }}
+                    className="relative flex-shrink-0 transition-all duration-200"
+                    style={{
+                        width: `${890 * baseScale * zoom}px`,
+                        height: `${1219 * baseScale * zoom}px`,
+                        margin: zoom > 1 ? '0 auto' : '0' // Centre le CV au milieu s'il est plus petit que l'écran
+                    }}
                 >
 
-                   {cvData.template === "modern" || cvData.template === "right-sidebar" ? (
-                        
-                        // --- TEMPLATE "MODERNE" & "INVERSÉ" (Sidebar -> toute la hauteur à gauche) ---
-                        <div className={`flex w-full h-full gap-8 ${cvData.template === "right-sidebar" ? "flex-row-reverse" : "flex-row"}`}>
-                            
-                            {/* Colonne gauche colorée (index 0) */}
-                            <div className={layoutToRender[0]?.size === 1 ? 'w-1/3' : 'w-2/3'}>
-                                {layoutToRender[0] && renderColumn(layoutToRender[0], 0)}
-                            </div>
-                            
-                            {/* Header + Contenu principal (index 1) */}
-                            <div className={`flex flex-col h-full ${layoutToRender[1]?.size === 1 ? 'w-1/3' : 'w-2/3'}`}>
-                                {renderHeader()}
-                                <hr className="border-t border-[#e3e3e3] my-6" />
-                                {layoutToRender[1] && renderColumn(layoutToRender[1], 1)}
-                            </div>
-
-                        </div>
-
-                    ) : (
-
-                        // --- TEMPLATE "CLASSIQUE" & "ELEGANT"  ---
-                        <div className="flex flex-col w-full h-full">
-
-                            {renderHeader()}
-                            {!isElegant && <hr className="border-t border-[#e3e3e3] my-4" />}
-                            
-                            <div className="flex w-full gap-4 flex-1">
-                                {layoutToRender.map((col, colIndex) => renderColumn(col, colIndex))}
-                            </div>
-
-                        </div>
-
-                    )}
-                            
-                      
-
-
-                </div>                            
                 
+                    {/* WRAPPER (on lui fait garder la taille d'une feuille A4) */}
+                    <div
+                        className="absolute top-0 left-0 bg-white shadow-2xl transition-transform duration-200 ease-out origin-top-left"
+                        style={{
+                            width: '890px',
+                            height: '1219px',
+                            transform: `scale(${baseScale * zoom})`,
+                            fontFamily: currentFontValue
+                        }}
+                    >
+                        
+                        {/* BOUTONS FLOTTANTS */}
+                        <div className={`absolute -top-4 right-10 z-50 flex gap-3 transition-all duration-300 ${!isLayoutMode ? "opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0" : "scale-105 -translate-y-2"}`}>
+                            
+                            {!isLayoutMode ? (
+
+                                // BOUTON "MODIFIER" (Mode normal)
+                                <button 
+                                    onClick={handleEnterLayoutMode}
+                                    className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-transparent backdrop-blur-sm border-3 border-[#4a2307]/70 text-[#4a2307]/80 hover:bg-[#4a2307]/10"
+                                >
+                                    Modifier la mise en page
+                                </button>
+
+                            ) : (
+
+                                // BOUTONS "Annuler" & "Valider" (Mode Layout)
+                                <>
+                                    <button 
+                                        onClick={handleCancelLayout}
+                                        className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-gray-500 text-white hover:bg-gray-600"
+                                    >
+                                        Annuler
+                                    </button>
+
+                                    <button 
+                                        onClick={handleValidateLayout}
+                                        className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-green-500 text-white hover:bg-green-600 "
+                                    >
+                                        Valider
+                                    </button>
+                                </>
+                            )}
+
+                        </div>
 
 
 
+
+                        {/* FEUILLE BLANCHE */}
+                        <div 
+                        id="cv-to-print" 
+                        className={`bg-white shadow-2xl p-10 flex flex-col w-full h-full transition-all duration-300 ${isLayoutMode ? "ring-4 ring-[#fccc69] ring-offset-4" : ""}`}
+                        style={{ fontFamily: currentFontValue }}
+                        >
+
+                        {cvData.template === "modern" || cvData.template === "right-sidebar" ? (
+                                
+                                // --- TEMPLATE "MODERNE" & "INVERSÉ" (Sidebar -> toute la hauteur à gauche) ---
+                                <div className={`flex w-full h-full gap-8 ${cvData.template === "right-sidebar" ? "flex-row-reverse" : "flex-row"}`}>
+                                    
+                                    {/* Colonne gauche colorée (index 0) */}
+                                    <div className={layoutToRender[0]?.size === 1 ? 'w-1/3' : 'w-2/3'}>
+                                        {layoutToRender[0] && renderColumn(layoutToRender[0], 0)}
+                                    </div>
+                                    
+                                    {/* Header + Contenu principal (index 1) */}
+                                    <div className={`flex flex-col h-full ${layoutToRender[1]?.size === 1 ? 'w-1/3' : 'w-2/3'}`}>
+                                        {renderHeader()}
+                                        <hr className="border-t border-[#e3e3e3] my-6" />
+                                        {layoutToRender[1] && renderColumn(layoutToRender[1], 1)}
+                                    </div>
+
+                                </div>
+
+                            ) : (
+
+                                // --- TEMPLATE "CLASSIQUE" & "ELEGANT"  ---
+                                <div className="flex flex-col w-full h-full">
+
+                                    {renderHeader()}
+                                    {!isElegant && <hr className="border-t border-[#e3e3e3] my-4" />}
+                                    
+                                    <div className="flex w-full gap-4 flex-1">
+                                        {layoutToRender.map((col, colIndex) => renderColumn(col, colIndex))}
+                                    </div>
+
+                                </div>
+
+                            )}
+                                    
+                            
+
+
+                        </div>                            
+                        
+
+                    </div>
+
+                </div>
 
             </div>
 

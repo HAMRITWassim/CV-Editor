@@ -156,6 +156,7 @@ function App() {
 	const [isCheckingSpelling, setIsCheckingSpelling] = useState(false);
     const [spellErrors, setSpellErrors] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [zoom, setZoom] = useState(1);	// Mutltiplicateur de zoom
 
 	// Lors du chargement de la page -> Lit le dernier CV dans la BDD, et le charge (rempalce les champs du CV par les valeurs dans la BDD)
 	useEffect(() => {
@@ -311,6 +312,8 @@ function App() {
 				onRedo={handleRedo} 
 				canUndo={historyState.currentIndex > 0} 
 				canRedo={historyState.currentIndex < historyState.history.length - 1}
+				zoom={zoom}
+				setZoom={setZoom}
 				/>
 
 				<div className="flex flex-1 overflow-hidden">
@@ -328,7 +331,7 @@ function App() {
 					<main className="flex-1 bg-[#F5EFE6] flex justify-center items-center p-8 overflow-hidden">
 						
 						{/* FEUILLE DE PREVISUALISATION DU CV */}
-						<CVPreview cvData={cvData} setCvData={setCvData}/>
+						<CVPreview cvData={cvData} setCvData={setCvData} zoom={zoom} setZoom={setZoom}/>
 
 					</main>
 

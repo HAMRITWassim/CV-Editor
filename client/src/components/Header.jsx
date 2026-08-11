@@ -2,11 +2,12 @@ import cvLogo from '../assets/cv_icon.png'
 
 // ICONS
 import { FaUndo, FaRedo } from "react-icons/fa";
+import { MdZoomIn, MdZoomOut } from "react-icons/md";
 
 import toast from "react-hot-toast"
 
 
-export default function Header({cvData, setCvData, onUndo, onRedo, canUndo, canRedo}){
+export default function Header({cvData, setCvData, onUndo, onRedo, canUndo, canRedo, zoom, setZoom}){
 
     // Gère la sauvegarde du CV
     const handleSaveCV = async () => {
@@ -112,6 +113,8 @@ export default function Header({cvData, setCvData, onUndo, onRedo, canUndo, canR
                 <img src={cvLogo} alt="cvLogo" className='h-14' />
             </div>
 
+            
+
             <h1 className='flex-1 flex justify-center font-bold text-[#311603]'>
                 <input 
                 type="text"
@@ -126,26 +129,54 @@ export default function Header({cvData, setCvData, onUndo, onRedo, canUndo, canR
 
             <div className=' flex-1 flex justify-end pr-6 gap-3'>
 
-            {/* BOUTONS UNDO et REDO */}
-            <div className="flex gap-4 mr-4">
-                <button 
-                    onClick={onUndo} 
-                    disabled={!canUndo}
-                    title="Annuler (Ctrl+Z)"
-                    className={`px-3 rounded-full transition-all duration-200 border-2 bg-transparent ${canUndo ? "hover:bg-[#61310e]/10 text-[#61310e] border-[#61310e]  cursor-pointer" : "text-gray-500 border-gray-500 opacity-50 cursor-not-allowed"}`}
-                >
-                    <FaUndo />
-                </button>
+                {/* BOUTONS UNDO et REDO */}
+                <div className="flex gap-4 mr-4">
+                    <button 
+                        onClick={onUndo} 
+                        disabled={!canUndo}
+                        title="Annuler (Ctrl+Z)"
+                        className={`px-3 rounded-full transition-all duration-200 border-2 bg-transparent ${canUndo ? "hover:bg-[#61310e]/10 text-[#61310e] border-[#61310e]  cursor-pointer" : "text-gray-500 border-gray-500 opacity-50 cursor-not-allowed"}`}
+                    >
+                        <FaUndo />
+                    </button>
 
-                <button 
-                    onClick={onRedo} 
-                    disabled={!canRedo}
-                    title="Rétablir (Ctrl+Y)"
-                    className={`px-3 rounded-full transition-all duration-200 border-2 bg-transparent ${canRedo ? "hover:bg-[#61310e]/10 text-[#61310e] border-[#61310e] cursor-pointer " : "text-gray-500 border-gray-500 opacity-50 cursor-not-allowed"}`}
-                >
-                    <FaRedo />
-                </button>
-            </div>
+                    <button 
+                        onClick={onRedo} 
+                        disabled={!canRedo}
+                        title="Rétablir (Ctrl+Y)"
+                        className={`px-3 rounded-full transition-all duration-200 border-2 bg-transparent ${canRedo ? "hover:bg-[#61310e]/10 text-[#61310e] border-[#61310e] cursor-pointer " : "text-gray-500 border-gray-500 opacity-50 cursor-not-allowed"}`}
+                    >
+                        <FaRedo />
+                    </button>
+                </div>
+
+                {/* BOUTONS ZOOM  */}
+                <div className="flex justify-start items-center gap-2 bg-gray-200/50 rounded-full px-3 py-1">
+                    
+                    {/* Bouton ZOOM - (MIN: 100%)*/}
+                    <button 
+                        onClick={() => setZoom(z => Math.max(1, z - 0.2))} 
+                        disabled={zoom <= 1} 
+                        className="p-1 hover:text-[#61310e] disabled:hover:text-black disabled:cursor-not-allowed disabled:opacity-30 transition-opacity cursor-pointer"
+                    >
+                        <MdZoomOut size={30} />
+                    </button>
+                    
+                    {/* Multiplicateur de Zoom */}
+                    <span className="text-sm font-bold font-mono w-12 text-center text-gray-700">
+                        {Math.round(zoom * 100)}%
+                    </span>
+                    
+                    {/* Bouton ZOOM + (MAX: 300%) */}
+                    <button 
+                        onClick={() => setZoom(z => Math.min(3, z + 0.2))} 
+                        disabled={zoom >= 3} 
+                        className="p-1 hover:text-[#61310e] disabled:opacity-30 transition-opacity cursor-pointer"
+                    >
+                        <MdZoomIn size={30} />
+                    </button>
+
+                </div>
 
 
                 {/* BOUTON SAUVEGARDER */}
@@ -166,6 +197,7 @@ export default function Header({cvData, setCvData, onUndo, onRedo, canUndo, canR
                 </button>
             </div>
             
+           
 
         </header>
         
