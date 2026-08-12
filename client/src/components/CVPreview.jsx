@@ -288,17 +288,108 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
                 )}
 
 
-                <h1 className="text-3xl font-bold">
-                    <span className="uppercase"> {cvData.personalInfo.lastName || "NOM"} </span>{cvData.personalInfo.firstName || "Prénom"} 
-                </h1>
+                <h1 className="text-3xl font-bold flex justify-center gap-2">
+                    
+                    {/* --- NOM --- */}
+                    <span 
+                    className={`uppercase outline-none transition-all rounded cursor-text ${!isLayoutMode ? "hover:bg-black/5 hover:shadow-inner focus:bg-white focus:ring-2 focus:ring-[#fccc69]" : ""}`}             
+                    contentEditable={!isLayoutMode}         // Rend le texte éditable (sauf en mode mise en page)
+                    suppressContentEditableWarning={true}
 
-                <h2 className="text-xl font-bold" style={{ color: isElegant ? "white" : mainColor }}>
+                    // Sauvegarde les modifications dans CvData uniquement quand on clique en dehors
+                    onBlur={(e) => {
+                            setCvData({
+                                ...cvData,
+                                personalInfo: { ...cvData.personalInfo, lastName: e.currentTarget.textContent }
+                            });
+                        }}
+                                    
+                    >
+                        {cvData.personalInfo.lastName || "NOM"} 
+
+                    </span>
+
+                    
+                    {/* --- PRÉNOM --- */}
+                    <span 
+                        className={`outline-none transition-all rounded  cursor-text ${!isLayoutMode ? "hover:bg-black/5 hover:shadow-inner focus:bg-white focus:ring-2 focus:ring-[#fccc69]" : ""}`}
+                        contentEditable={!isLayoutMode}
+                        suppressContentEditableWarning={true}
+                        onBlur={(e) => {
+                            setCvData({
+                                ...cvData,
+                                personalInfo: { ...cvData.personalInfo, firstName: e.currentTarget.textContent }
+                            });
+                        }}
+                    >
+                        {cvData.personalInfo.firstName || "Prénom"}
+                    </span>
+
+
+                </h1>
+                
+                {/* --- TITRE DU POSTE --- */}
+                <h2 
+                    className={`text-xl font-bold outline-none transition-all rounded cursor-text ${!isLayoutMode ? "hover:bg-black/5 hover:shadow-inner focus:bg-white focus:ring-2 focus:ring-[#fccc69]" : ""}`} 
+                    style={{ color: isElegant ? "white" : mainColor }}
+                    contentEditable={!isLayoutMode}
+                    suppressContentEditableWarning={true}
+                    onBlur={(e) => {
+                        setCvData({
+                            ...cvData,
+                            personalInfo: { ...cvData.personalInfo, jobTitle: e.currentTarget.textContent }
+                        });
+                    }}
+                >
                     {cvData.personalInfo.jobTitle || "Titre du poste"}
                 </h2>
                 
+
                 <h3 className={`text-gray-500 text-sm flex gap-3 w-full ${headerJustifyClass} ${isElegant ? "text-white/70" : "text-gray-500"} `}>
-                    <p className="flex items-center"> <MdOutlineMailOutline className="mr-1"/> {cvData.personalInfo.email || "E-mail"} </p>
-                    <p className="flex items-center"> <IoPhonePortraitOutline className="mr-1"/> {cvData.personalInfo.phone || "N° de téléphone"} </p>
+
+                    {/* --- EMAIL --- */}
+                    <p className="flex items-center"> 
+
+                        <MdOutlineMailOutline className="mr-1"/>
+
+                        <span 
+                        className={`outline-none transition-all rounded cursor-text ${!isLayoutMode ? "hover:bg-black/10 hover:shadow-inner focus:bg-white focus:text-black focus:ring-2 focus:ring-[#fccc69]" : ""}`}
+                        contentEditable={!isLayoutMode}
+                        suppressContentEditableWarning={true}
+                        onBlur={(e) => {
+                            setCvData({
+                                ...cvData,
+                                personalInfo: { ...cvData.personalInfo, email: e.currentTarget.textContent }
+                            });
+                        }}
+                        >
+                            {cvData.personalInfo.email || "E-mail"}
+
+                        </span>
+
+                    </p>
+
+                    {/* --- TELEPHONE --- */}
+                    <p className="flex items-center"> 
+                        <IoPhonePortraitOutline className="mr-1"/> 
+
+                        <span 
+                        className={`outline-none transition-all rounded cursor-text ${!isLayoutMode ? "hover:bg-black/10 hover:shadow-inner focus:bg-white focus:text-black focus:ring-2 focus:ring-[#fccc69]" : ""}`}
+                        contentEditable={!isLayoutMode}
+                        suppressContentEditableWarning={true}
+                        onBlur={(e) => {
+                            setCvData({
+                                ...cvData,
+                                personalInfo: { ...cvData.personalInfo, phone: e.currentTarget.textContent }
+                            });
+                        }}
+                        >
+                            {cvData.personalInfo.phone || "N° de téléphone"}
+                            
+                        </span>
+                        
+                    </p>
+
                 </h3>
 
             </header>
@@ -348,6 +439,8 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
         // Créé le rendu visuel d'une section du CV selon son nom (Ajoute un style visuel si l'on est en mode édition)
         const renderBlock = (blockName, colIndex, itemIndex) => {
 
+            const editableClass = !isLayoutMode ? "outline-none transition-all rounded cursor-text hover:bg-black/5 hover:shadow-inner focus:bg-white focus:ring-2 focus:ring-[#fccc69]" : "";
+
             // Lit l'alignement de la colonne
             const colAlign = layoutToRender[colIndex].alignment || "left";
 
@@ -375,7 +468,21 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
                                     <li key={skill._id || skill.id || index} className={`text-sm text-gray-700 font-medium flex items-center overflow-clip ${justifyClass}`}>
                                         
                                         <span className="w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mainColor }}></span>
-                                        {skill.name}
+
+                                        <span
+                                        className={editableClass}
+                                        contentEditable={!isLayoutMode}
+                                        suppressContentEditableWarning={true}
+                                        onBlur={(e) => {
+                                            const newSkills = [...cvData.skills];
+                                            newSkills[index].name = e.currentTarget.textContent;
+                                            setCvData({ ...cvData, skills: newSkills });
+                                        }}
+                                        >
+
+                                            {skill.name || "Compétence"}
+
+                                        </span>
 
                                     </li>
                                 ))
@@ -404,7 +511,23 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
                                 cvData.languages.map((language, index) => (
 
                                     <li key={language._id || language.id || index} className="text-sm overflow-clip">
-                                        <p className="font-bold text-gray-800">{language.name}</p>
+
+                                        <p 
+                                        className={`font-bold text-gray-800 w-fit ${editableClass}`}
+                                        contentEditable={!isLayoutMode}
+                                        suppressContentEditableWarning={true}
+                                        onBlur={(e) => {
+                                            const newLanguages = [...cvData.languages];
+                                            newLanguages[index].name = e.currentTarget.textContent;
+                                            setCvData({ ...cvData, languages: newLanguages });
+                                        }}
+                                        >
+
+                                            {language.name || "Langue"}
+
+                                        </p>
+
+
                                         <p className="text-xs text-gray-500 italic">{translateLevel(language.level)}</p>
                                     </li>
                                 ))
@@ -437,16 +560,42 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
                                         {/* En-tête de l'expérience (Titre, date..)*/}
                                         <div className={`${headerFlexClass} mb-1 w-full`}>
 
-                                            <h3 className="font-bold text-gray-900">{experience.position || "Poste"}</h3>
+                                            <h3 
+                                            className={`font-bold text-gray-900 ${editableClass}`}
+                                            contentEditable={!isLayoutMode}
+                                            suppressContentEditableWarning={true}
+                                            onBlur={(e) => {
+                                                const newExp = [...cvData.experiences];
+                                                newExp[index].position = e.currentTarget.textContent;
+                                                setCvData({ ...cvData, experiences: newExp });
+                                            }}
+                                            >
+
+                                                {experience.position || "Poste"}
+
+                                            </h3>
+
 
                                             <span className="text-xs font-semibold rounded-md px-1 py-0.5 whitespace-nowrap shrink-0" style={{ color: mainColor, backgroundColor: lightColor }}>
                                                 {toNumericDateFormat(experience.startDate)} {toNumericDateFormat(experience.startDate) && toNumericDateFormat(experience.endDate) && " - "} {toNumericDateFormat(experience.endDate)}
                                             </span>
 
                                         </div>
+
                                         
-                                        <h4 className="text-sm font-bold text-gray-400 mb-2">
+                                        <h4 
+                                        className={`text-sm font-bold text-gray-400 mb-2 w-fit ${editableClass}`}
+                                        contentEditable={!isLayoutMode}
+                                        suppressContentEditableWarning={true}
+                                        onBlur={(e) => {
+                                            const newExp = [...cvData.experiences];
+                                            newExp[index].company = e.currentTarget.textContent;
+                                            setCvData({ ...cvData, experiences: newExp });
+                                        }}
+                                        >
+
                                             {experience.company || "Entreprise"}
+
                                         </h4>
                                         
                                         {/* Affichage du RichTextEditor */}
@@ -485,7 +634,21 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
 
                                         <div className={`${headerFlexClass} mb-1 w-full`}>
 
-                                            <h3 className="font-bold text-gray-900">{formation.degree || "Diplôme"}</h3>
+                                            <h3 
+                                            className={`font-bold text-gray-900 ${editableClass}`}
+                                            contentEditable={!isLayoutMode}
+                                            suppressContentEditableWarning={true}
+                                            onBlur={(e) => {
+                                                const newEdu = [...cvData.education];
+                                                newEdu[index].degree = e.currentTarget.textContent;
+                                                setCvData({ ...cvData, education: newEdu });
+                                            }}
+                                            >
+
+                                                {formation.degree || "Diplôme"}
+
+                                            </h3>
+
 
                                             <span className="text-xs font-semibold rounded-md px-1 py-0.5 whitespace-nowrap shrink-0" style={{ color: mainColor, backgroundColor: lightColor }}>
                                                 {toNumericDateFormat(formation.startDate)} {toNumericDateFormat(formation.startDate) && toNumericDateFormat(formation.endDate) && " - "} {toNumericDateFormat(formation.endDate)}
@@ -493,8 +656,19 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
 
                                         </div>
                                         
-                                        <h4 className="text-sm text-gray-600">
-                                            {formation.school || <p className="text-[#a8a8a8]">École / Établissement</p>}
+                                        <h4 
+                                        className={`text-sm text-gray-600 w-fit ${editableClass}`}
+                                        contentEditable={!isLayoutMode}
+                                        suppressContentEditableWarning={true}
+                                        onBlur={(e) => {
+                                            const newEdu = [...cvData.education];
+                                            newEdu[index].school = e.currentTarget.textContent;
+                                            setCvData({ ...cvData, education: newEdu });
+                                        }}
+                                        >
+
+                                            {formation.school || "École / Établissement"}
+
                                         </h4>
 
                                     </div>
