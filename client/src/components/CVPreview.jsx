@@ -720,7 +720,42 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
     return(
 
         // Arrière plan (derrière la feuille) 
-        <div ref={containerRef} className="w-full h-full overflow-hidden bg-[#F5EFE6] relative">
+        <div ref={containerRef} className="group w-full h-full overflow-hidden bg-[#F5EFE6] relative ">
+
+            {/* BOUTONS FLOTTANTS */}
+                        <div className={`absolute bottom-8  left-1/2 -translate-x-1/2 z-50 flex gap-3 transition-all duration-300 ${!isLayoutMode ? "opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0" : "scale-105 -translate-y-2"}`}>
+                            
+                            {!isLayoutMode ? (
+
+                                // BOUTON "MODIFIER" (Mode normal)
+                                <button 
+                                    onClick={handleEnterLayoutMode}
+                                    className="px-6 py-2 rounded-full font-bold text-xs shadow-lg transition-all cursor-pointer bg-transparent backdrop-blur-lg border-3 border-[#4a2307]/70 text-[#4a2307]/80 hover:bg-[#4a2307]/10"
+                                >
+                                    Modifier la mise en page
+                                </button>
+
+                            ) : (
+
+                                // BOUTONS "Annuler" & "Valider" (Mode Layout)
+                                <>
+                                    <button 
+                                        onClick={handleCancelLayout}
+                                        className="px-6 py-2 rounded-full font-bold text-xs shadow-lg transition-all cursor-pointer bg-gray-500 text-white hover:bg-gray-600"
+                                    >
+                                        Annuler
+                                    </button>
+
+                                    <button 
+                                        onClick={handleValidateLayout}
+                                        className="px-6 py-2 rounded-full font-bold text-xs shadow-lg transition-all cursor-pointer bg-green-500 text-white hover:bg-green-600 "
+                                    >
+                                        Valider
+                                    </button>
+                                </>
+                            )}
+
+                        </div>
 
             {/* Zone scrollable quand on zoome*/}
             <div 
@@ -749,40 +784,7 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
                         }}
                     >
                         
-                        {/* BOUTONS FLOTTANTS */}
-                        <div className={`absolute -top-4 right-10 z-50 flex gap-3 transition-all duration-300 ${!isLayoutMode ? "opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0" : "scale-105 -translate-y-2"}`}>
-                            
-                            {!isLayoutMode ? (
-
-                                // BOUTON "MODIFIER" (Mode normal)
-                                <button 
-                                    onClick={handleEnterLayoutMode}
-                                    className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-transparent backdrop-blur-sm border-3 border-[#4a2307]/70 text-[#4a2307]/80 hover:bg-[#4a2307]/10"
-                                >
-                                    Modifier la mise en page
-                                </button>
-
-                            ) : (
-
-                                // BOUTONS "Annuler" & "Valider" (Mode Layout)
-                                <>
-                                    <button 
-                                        onClick={handleCancelLayout}
-                                        className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-gray-500 text-white hover:bg-gray-600"
-                                    >
-                                        Annuler
-                                    </button>
-
-                                    <button 
-                                        onClick={handleValidateLayout}
-                                        className="px-6 py-2 rounded-full font-bold text-lg shadow-lg transition-all cursor-pointer bg-green-500 text-white hover:bg-green-600 "
-                                    >
-                                        Valider
-                                    </button>
-                                </>
-                            )}
-
-                        </div>
+                        
 
 
 
