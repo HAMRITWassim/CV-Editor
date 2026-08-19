@@ -380,7 +380,7 @@ export default function Sidebar({
                                     <button
                                     className={`border rounded-full p-0.5  bg-transparent ${index === cvData.experiences.length - 1 ? "text-gray-200" : "text-[#fccc69] hover:bg-amber-400/25 cursor-pointer"} transition-colors duration-100`}
                                     onClick={() => moveItem("experiences", index, "down")}
-                                    disabled={index === cvData.education.length - 1}
+                                    disabled={index === cvData.experiences.length - 1}
                                     >
                                         <IoArrowDown />
                                     </button>

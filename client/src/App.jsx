@@ -65,7 +65,7 @@ function App() {
 			newHistory.push(clonedData);
 
 			// Limite de 20 CVs dans l'historique
-			if (newHistory.lenght > 20)
+			if (newHistory.length > 20)
 			{
 				newHistory.shift();
 				return { history: newHistory, currentIndex: 19};
