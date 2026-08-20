@@ -210,7 +210,12 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
 
         // Entre en mode Layout
         const handleEnterLayoutMode = () => {
-            setLayoutSnapshot(JSON.parse(JSON.stringify(cvData.layout || DEFAULT_LAYOUT))); // Copie du Layout actuel
+            // Copie du Layout actuel + l'alignement
+            setLayoutSnapshot({
+                layout: JSON.parse(JSON.stringify(cvData.layout || DEFAULT_LAYOUT)),
+                headerAlignment: cvData.headerAlignment || "left"
+            }); 
+
             setIsLayoutMode(true);
         }
 
@@ -225,7 +230,12 @@ export default function CVPreview({cvData, setCvData, zoom, setZoom}){
         // Annule les changements du mode Layout
         const handleCancelLayout = () => {
             if(layoutSnapshot) {
-                setCvData({ ...cvData, layout: layoutSnapshot }); // On repasse sur le layout avant les changements
+                // On repasse sur le layout & l'alignement d'avant les changements
+                setCvData((prevCv) => ({ 
+                    ...prevCv, 
+                    layout: layoutSnapshot.layout,
+                    headerAlignment: layoutSnapshot.headerAlignment
+                })); 
             }
 
             setIsLayoutMode(false);
